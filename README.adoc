@@ -59,11 +59,16 @@ singular, in combination or dependency of another *Building Block*.
 
 Please check the following list of existing and planned *Building Blocks*
 
-* https://gitlab.consulting.redhat.com/tigers/stc/blob/master/docs/bb0.adoc[BB0 - Validate and prepare infrastructure]
-* https://gitlab.consulting.redhat.com/tigers/stc/blob/master/docs/bb1.adoc[BB1 - Install Minimal Viable Product]
-* https://gitlab.consulting.redhat.com/tigers/stc/blob/master/docs/bb4.adoc[BB4 - Disconnected Installation with Docker Distribution]
+* https://github.com/RedHat-EMEA-SSA-Team/stc/blob/master/docs/bb0.adoc[BB0 - Validate and prepare infrastructure]
+* https://github.com/RedHat-EMEA-SSA-Team/stc/blob/master/docs/bb1.adoc[BB1 - Install Minimal Viable Product]
+* https://github.com/RedHat-EMEA-SSA-Team/stc/blob/master/docs/bb4.adoc[BB4 - Disconnected Installation with Docker Distribution]
 
 An archive of BB not yet tested nor updated for newest versions is available inside the `archive` directory
+
+== Get started
+Check prerequirements for executing STC from https://github.com/RedHat-EMEA-SSA-Team/stc/blob/master/docs/getstarted.adoc[here].
+
+Once prerequirements are in place start validating your environment with https://github.com/RedHat-EMEA-SSA-Team/stc/blob/master/docs/bb0.adoc[BB0]
 
 == Want to contribute?
 
