@@ -81,8 +81,6 @@ openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 
 {% else %}
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
 {% endif %}
-# Enable API service auditing, available as of 3.2
-openshift_master_audit_config={"enabled": true}
 
 # Provide local certificate paths which will be deployed to masters
 openshift_master_overwrite_named_certificates=true
@@ -234,7 +232,7 @@ openshift_grafana_storage_volume_size=1Gi
 {% if '%0.2f'| format(ocp_version|float) == '3.10' %}
 {{infra_node}} openshift_node_group_name='node-config-infra'
 {% else %}
-{{infra_node}} openshift_node_labels="{'region':'infra', 'zone':'{{loop.index}}', 'target':'router'}" 
+{{infra_node}} openshift_node_labels="{'region':'infra', 'zone':'{{loop.index}}', 'target':'router'}"
 {% endif %}
 {% endfor %}
 {% for node in nodes %}
@@ -266,4 +264,3 @@ openshift_grafana_storage_volume_size=1Gi
 {% if bastion is defined %}
 {{bastion}}
 {% endif %}
-

@@ -12,8 +12,10 @@ https://gitlab.consulting.redhat.com/tigers/stc/blob/master/docs/bb0.adoc[Buildi
 Please login to your *bastion* server and run the following commands
 
 ```
-$ cd /tmp/ocppoc
-$ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+# export WORK_DIR=/root/stc
+$ cd $WORK_DIR
+$ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+
 ```
 
 Once your output ends with
@@ -27,6 +29,11 @@ master03                   : ok=446  changed=48   unreachable=0    failed=0
 node01                     : ok=228  changed=18   unreachable=0    failed=0
 node02                     : ok=230  changed=28   unreachable=0    failed=0
 node03                     : ok=230  changed=28   unreachable=0    failed=0
+```
+
+```
+$ cd $WORK_DIR
+$ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
 ```
 
 you should have a running Red Hat OpenShift Enterprise cluster.
@@ -58,13 +65,3 @@ This will
   * will give the user `admin` the password `change12_me`, which you can obviously
   change to your liking
   * will make user `admin` to a cluster-admin
-
-==== Add additional user
-If you want to add additional user to your Red Hat Openshift cluster, please do run the following commands
-
-```
-$ cd /tmp/ocppoc/
-$ ansible-playbook playbooks/bb1/add_user.yml
-```
-
-answer the questions for the name and password of the new user to complete this step.

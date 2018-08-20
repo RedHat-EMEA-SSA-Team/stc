@@ -67,4 +67,4 @@ An archive of BB not yet tested nor updated for newest versions is available ins
 
 == Want to contribute?
 
-Check basic information about contributing building blocks from https://gitlab.consulting.redhat.com/tigers/stc/blob/master/docs/contributing.adoc[Contributing to STC]
+Check basic information about contributing building blocks from Check basic information about contributing building blocks from https://github.com/RedHat-EMEA-SSA-Team/stc/blob/master/docs/contributing.adoc[Contributing to STC]

@@ -30,6 +30,20 @@ NOTE: Please be aware that currently Red Hat Openshift expects a minimum of
 
 === Steps to Perform for this Building Block
 
+==== Download Scripts and Playbooks
+With the YAML Configuration file ready, you will now have to download the
+scripts and Ansible Playbooks. To do so, please run the following commands
+on your *Bastion* server as `root`.
+
+```
+$ sudo -i
+$ export WORK_DIR=/root/stc
+$ cd $WORK_DIR
+$ curl -o stc.tgz  -L https://github.com/RedHat-EMEA-SSA-Team/stc/archive/latest.tar.gz
+$ tar -xzvf stc.tgz --strip 1
+$ chmod +x setup.sh
+```
+
 ==== Prepare Configuration File
 As a first step, you need to create a configuration YAML file named `env.yml`, describing your
 environment. Based on this file, this *Building Block* will perform a set of
@@ -38,14 +52,10 @@ verification steps.
 To make the creation of this configuration YAML file as easy as possible,
 we provided a simple script ad STC Installer for you:
 
-```
-$ ./setup.sh 
-```
-
 Please fill in the following information into the script when prompted, default value are inside []
 
 
-* Hardware Requirements: If your infrastructure respect hardware requirements 
+* Hardware Requirements: If your infrastructure respect hardware requirements
 * OCP Version: Select OpenShift version, default is 3.9
 * Cluster hostname (API DNS):  Hostname under which your Red Hat Openshift cluster
 will be accessible after installation
@@ -72,7 +82,7 @@ for Openshift. Must have sudo access on hosts. Defaults to root.
 * Red Hat account username: your accountname on the Red Hat website.
 * Remote SSL user: Remote user which is used to access all hosts used
 for Openshift. Must have sudo access on hosts. Defaults to root.
-* How do you manage your subscription and repositories: Select RHSM for direct access to Red Hat CDN for 
+* How do you manage your subscription and repositories: Select RHSM for direct access to Red Hat CDN for
 Subscription Management or select Satellite if present
 * RHSM Username: Select your RHSM Username, password will be asked and stored in Ansible Vault later
 * Satellie Org ID and Activation Key: Provide an Org ID and an Acivation Key which containers OpenShift required repositories through
@@ -132,8 +142,8 @@ nodes:
 - node02
 - node03
 ssh_user: cloud-user
-apps_dns: apps.your-ip.nip.io  
-api_dns: master.your-ip.nip.io 
+apps_dns: apps.your-ip.nip.io
+api_dns: master.your-ip.nip.io
 rhn_username: username
 ```
 
@@ -152,25 +162,13 @@ ssh_user: cloud-user
 proxy_http: 'http://proxy.company.local:3128'
 proxy_https: 'http://proxy.company.local:3128'
 proxy_no: 'satellite.company.local,localhost,127.0.0.1'
-apps_dns: apps.company.local    
-api_dns: master01.company.local    
+apps_dns: apps.company.local
+api_dns: master01.company.local
 rhn_username: username
 ```
 
-==== Download Scripts and Playbooks
-With the YAML Configuration file ready, you will now have to download the
-scripts and Ansible Playbooks. To do so, please run the following commands
-on your *Bastion* server as `root`.
 
-```
-wget -c http://bit.ly/stc-tigers
-tar xvf archive.tar.b2
-cd stc*
-chmod +x setup.sh
-
-```
-
-==== Setup bastion host and  validate configuration
+==== Setup bastion host and validate configuration
 In this step, we will be using a script to
 
 * prepare the *Bastion* system
@@ -191,12 +189,12 @@ The script will ask you:
 After this it will start registering Bastion host and start the validation across nodes, preparing an inventory file to be used to install OCP later on.
 
 ```
- ____ _____ ____ 
+ ____ _____ ____
 / ___|_   _/ ___|
-\___ \ | || |    
- ___) || || |___ 
+\___ \ | || |
+ ___) || || |___
 |____/ |_| \____|
-                 
+
 
 
 Welcome to STC OpenShift Installation Validator
@@ -208,7 +206,7 @@ n
 Please select OCP Version to install: 3.10, 3.9 or 3.7
 3.10 [3.9] 3.7
 
-*** selected 3.9 
+*** selected 3.9
 
 Please insert Cluster hostname (API DNS):
 openshift.example.com
