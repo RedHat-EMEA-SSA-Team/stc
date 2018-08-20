@@ -1,0 +1,19 @@
+version: 0.1
+log:
+  level: warn
+  fields:
+    service: registry
+storage:
+    cache:
+        layerinfo: inmemory
+    filesystem:
+        rootdirectory: /var/lib/registry
+http:
+    addr: :{{registry.split(':')[1] }}
+    relativeurls: true
+    secret: {{registry_secret}}
+    tls:
+      certificate: /etc/docker-distribution/registry/cert.cert
+      key: /etc/docker-distribution/registry/cert.key
+      #clientcas: /etc/docker-distribution/registry/ca.cert
+

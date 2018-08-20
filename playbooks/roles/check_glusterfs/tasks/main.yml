@@ -1,0 +1,16 @@
+- name: Check if NTP enabled
+  shell: |
+    timedatectl | grep "NTP enabled: yes" 
+  ignore_errors: true
+  register: ntp_enabled
+- name: Check if NTP synchronized
+  shell: |
+    timedatectl | grep "NTP synchronized: yes"
+  ignore_errors: true
+  register: ntp_synchronized
+- name: Signal if NTP is not enable or synchronized
+  debug:
+    msg: |
+      {{ ntp_enable.stdout }}
+  when: ntp_enabled.rc != 0 or ntp_synchronized.rc != 0
+

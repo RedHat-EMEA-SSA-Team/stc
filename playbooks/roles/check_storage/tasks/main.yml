@@ -1,0 +1,16 @@
+- shell: |
+    if [[ $(df -T / | tail -n 1 | awk '{print $2}') == "btrfs" ]]; then
+      btrfs fi usage --kbytes / | awk '/^.*Free / {print $3}'| sed 's/\..*//'
+    else
+      df -BK / | awk '/^[^Filesystem]/ {print $4}' | sed 's/K//'
+    fi
+  changed_when: false
+  register: root_space_available
+- name: Set root disk facts
+  set_fact:
+    root_space_available_bytes: "{{ ( root_space_available.stdout | int) * 1024 | int }}"
+- name: Fail if there is not enough space available in /
+  assert:
+    that: |
+      (root_space_available_bytes | int) >= (disk_free_space * 1000000000 | int)
+    msg: "There is no enough space available on this node"

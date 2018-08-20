@@ -1,0 +1,4 @@
+- name: check if selinux is running and enforced
+  command: getenforce
+  register: sestatus
+  changed_when: false

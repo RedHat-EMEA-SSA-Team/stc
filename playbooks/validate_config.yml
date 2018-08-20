@@ -1,0 +1,74 @@
+---
+- name: Collect host information
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  vars_files:
+  - "{{file_env}}"
+  vars_prompt:
+  - name: sudo_password
+    prompt: Password for sudo, leave blank if passwordless sudo (will be encypted)
+    private: yes
+  - name: rhn_password
+    prompt: Red Hat account password, leave blank if Satellite is using (will be encrypted)
+    private: yes
+  tasks:
+  - name: Cleanup
+    file:
+      path: "{{item}}"
+      state: absent
+    with_items:
+    - "{{file_ip_data}}"
+    - "{{file_inventory}}"
+    - "{{file_secrets}}"
+  - name: Ensure secrets file
+    copy:
+      dest: "{{file_secrets}}"
+      content: |
+        sudo_password: "{{sudo_password}}"
+        rhn_password: "{{rhn_password}}"
+  - name: Verify Masters IP addresses
+    local_action: |
+      shell ping -c 1 {{item}} | grep "PING"| sed -e 's/[^a-zA-Z0-9.]/ /g' | awk '{print $3 ": {{item }}" }' >> {{file_ip_data}}
+    with_items: "{{masters}}"
+  - name: Verify Infranodes IP addresses
+    local_action: |
+      shell ping -c 1 {{item}} | grep "PING"| sed -e 's/[^a-zA-Z0-9.]/ /g' | awk '{print $3 ": {{item }}" }' >> {{file_ip_data}}
+    with_items: "{{infranodes | default([])}}"
+  - name: Verify Nodes IP addresses
+    local_action: |
+      shell ping -c 1 {{item}} | grep "PING"| sed -e 's/[^a-zA-Z0-9.]/ /g' | awk '{print $3 ": {{item }}" }' >> {{file_ip_data}}
+    with_items: "{{nodes}}"
+  - name: Verify CNS IP addresses
+    local_action: |
+      shell ping -c 1 {{item}} | grep "PING"| sed -e 's/[^a-zA-Z0-9.]/ /g' | awk '{print $3 }'
+    with_items: "{{cns | default([])}}"
+    register: cns_data
+  - local_action: |
+      shell cat "{{file_ip_data}}"
+    register: ip_data
+  - name: Print IP addresses
+    debug:
+      msg: |
+        Manager to find following IP adresses:
+        "{{ip_data.stdout }}"
+
+  - name: register cns hosts
+    set_fact:
+      cns_hosts: []
+    when: cns is defined
+
+  - name: register cns ip
+    set_fact:
+      cns_hosts: "{{cns_hosts}} + ['{{ item.stdout }}']"
+    with_items: "{{cns_data.results}}"
+    when: cns is defined
+
+  - name: debug cns hosts
+    debug: var=cns_hosts
+    when: cns is defined
+
+  - name: Create Inventory file based on dynamic collected information.
+    template:
+      src: templates/hosts.j2
+      dest: "{{file_inventory}}"

@@ -1,0 +1,21 @@
+== Building Block 4 - Disconnected Installation with Docker Distribution
+This *Building Block* is targeted to support Disconnected Installation.
+
+It installs a Docker Registry in the bastion to sync and proxy all requires Container images for
+OCP installation.
+
+=== Prerequisites for this Building Block
+* BB0 with Satellite based subscription management (RPMS)
+=== Steps to Perform for this Building Block
+
+Change registry hostname and port in
+
+```
+playbooks/vars/bb4.yml
+```
+
+And the run it
+
+```
+ansible-playbook playbooks/bb4/disconnected.yml
+```

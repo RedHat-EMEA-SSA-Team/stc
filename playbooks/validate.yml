@@ -1,0 +1,102 @@
+---
+- name: Validate proxy
+  hosts: all
+  gather_facts: yes
+  vars:
+    proxy_uc_envs:
+    - HTTP_PROXY
+    - HTTPS_PROXY
+    - NO_PROXY
+    proxy_lc_envs:
+    - http_proxy
+    - https_proxy
+    - no_proxy
+    proxies:
+    - "{{ proxy_http }}"
+    - "{{ proxy_https }}"
+    - "{{ proxy_no }}"
+  vars_files:
+  - "{{file_env}}"
+  - "{{file_secrets}}"
+  roles:
+  - check_proxy
+
+- name: ensure bastion packages.
+  hosts: bastion
+  gather_facts: yes
+  vars_files:
+  - "{{file_env}}"
+  roles:
+  - check_packages_bastion
+
+- name: ensure nodes packages.
+  hosts: nodes
+  serial: 1
+  gather_facts: no
+  vars_files:
+  - "{{file_env}}"
+  roles:
+  - check_packages_nodes
+
+- name: Validate environment
+  gather_facts: no
+  hosts: all
+  vars_files:
+  - "{{file_env}}"
+  - "{{file_secrets}}"
+  tasks:
+    - import_role:
+        name: check_subscription
+    - import_role:
+        name: check_os
+    - import_role:
+        name: check_connectivity
+    - import_role:
+        name: check_sizing
+      when: inventory_hostname in groups['nodes']
+    - import_role:
+        name: check_dns
+    - import_role:
+        name: check_selinux
+    - import_role:
+        name: check_storage
+      when: inventory_hostname in groups['nodes']
+    - import_role:
+        name: check_nm
+    - import_role:
+        name: check_glusterfs
+      when: inventory_hostname in groups['glusterfs'] | default([])
+
+
+- name: Initialize firewall check
+  hosts: nodes
+  gather_facts: no
+  vars_files:
+  - "{{file_env}}"
+  roles:
+  - check_firewall_initialize
+
+- name: Execute firewall check
+  hosts: localhost
+  gather_facts: yes
+  vars_files:
+  - "{{file_env}}"
+  roles:
+  - check_firewall
+
+- name: Validate docker
+  hosts: nodes
+  gather_facts: ys
+  vars_files:
+  - "{{file_env}}"
+  roles:
+  - check_docker_setup
+  - check_docker_validation
+
+- name: Cleanup validation trash
+  hosts: all
+  gather_facts: yes
+  vars_files:
+  - "{{file_env}}"
+  roles:
+  - check_cleanup

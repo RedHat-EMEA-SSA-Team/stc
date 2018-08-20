@@ -1,0 +1,21 @@
+== Building Block 3 - Install CFME on Openshift
+This *Building Block* is targeted to install Cloudforms Management Engine (CFME) on Openshift.
+
+Installer will install cfme server, postgresql and memcache containers
+
+=== Prerequisites for this Building Block
+To be able to perform this *Building Block*, you will have to successfully complete following *Building Blocks*
+[square]
+- BB 1
+- BB 2
+
+=== Steps to Perform for this Building Block
+
+By default project `cfme` will created and containarized CFME will be installed to that project. If you need to modify defaults settings, all setting are in file `/root/ocppoc/playbooks/vars/bb3.yml`
+
+Use below command to deploy CFME on Openshift
+```
+ansible-playbook  /tmp/ocppoc/playbooks/bb3/cloudforms.yml
+```
+
+Intaller will create route with hostname cfme. + apps DNS (eg. cfme.apps.example.com)

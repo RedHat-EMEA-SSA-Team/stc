@@ -1,0 +1,13 @@
+- name: Ensure that NetworkManager is running
+  command: systemctl status NetworkManager
+  ignore_errors: yes
+  changed_when: false
+  register: service_NetworkManager_status
+- name: Report status of Network Manager
+  fail:
+    msg: |
+      Service NetworkManager is not running.
+      Output of `systemctl status NetworkManager`:
+      {{ service_NetworkManager_status.stdout }}
+      {{ service_NetworkManager_status.stderr }}
+  when: service_NetworkManager_status | failed

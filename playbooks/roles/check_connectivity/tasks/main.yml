@@ -1,0 +1,14 @@
+- name: cURL proxy whitelisted sites
+  shell: "curl -s http://{{item}} -o /dev/null"
+  with_items: "{{proxy_whitelist}}"
+  register: connectivity
+  changed_when: false
+- name: Check download speed
+  shell: "curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python - | grep Download | awk '{print $2}'"
+  register: bandwidth
+  changed_when: false
+- set_fact:
+    download_speed: "{{bandwidth.stdout}}"
+- debug:
+    msg: "Download speed is {{download_speed}}"
+  failed_when: "(download_speed | int) < bandwidth_limit"

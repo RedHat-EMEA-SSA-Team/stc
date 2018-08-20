@@ -1,0 +1,43 @@
+== Gettings started with STC
+
+To get started you will need two main things
+
+[square]
+* At least 7 VMs / hosts
+* RedHat Openshift Container Platform subscription
+
+=== Hardware requirements
+
+These are minimal hardware requirements
+
+[square]
+* 2 vCPU
+* 16 GB memory
+* storage
+** device 1 (for OS)
+*** 20 Gb /
+*** 40 Gb /var
+** device 2 (for container runtime storage)
+*** 40 Gb (no file system or mount needed)
+** device 3 (for Openshift Container Storage)
+*** 100+ Gb (no file system or mount needed)
+
+All hosts should be identical
+
+=== Network requirements
+* at least one network device and IP address
+* NetworkManager enabled
+* resolvable hostnames
+* Wildcard DNS A record for applications (*.apps.your.company.com)
+* DNS A record for master API (master.your.company.com)
+* hosts need to have access to each other (all ports or ports listed https://docs.openshift.com/container-platform/latest/install_config/install/prerequisites.html#required-ports[in here])
+* Internet connection, direct or thru proxy
+* at least one of the hosts must able to get SSL connection to all others hosts
+
+=== Operating system requirements
+* RHEL 7.4+ minimal (OS will be updated during validation phase)
+* root or sudo access
+
+=== Other useful info
+* Information about proxy; address, username, password, whitelists etc.
+* RedHat Network (RHN) account info for registering and subscribing hosts (activation key works also)

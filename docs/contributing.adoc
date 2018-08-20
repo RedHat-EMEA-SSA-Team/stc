@@ -1,0 +1,59 @@
+== Contributing content to STC
+
+If you 
+
+ * have idea about useful *Building Blocks*
+ * improvements on the documentation
+ * bugfixes ( yes we sometimes do have bugs ... )
+ 
+please contribute.
+
+=== Some basic guidelines
+
+Directory structure is like this:
+
+```
+.
+├── README.adoc
+├── docs
+│   ├── bb_template.adoc
+│   ├── bb0.adoc
+│   ├── bb1.adoc
+│   ├── bb2.adoc
+│   └── ...
+├── playbooks
+│   ├── bb1
+│   │   ├── bb1.yml
+│   │   └── roles
+│   │       └── ...
+│   ├── bb2
+│   │   └── ...
+│   ├── group_vars
+│   ├── vars
+│   │   ├── bb1.yml
+│   │   ├── bb2.yml
+│   │   └── ...
+└── ...
+...
+```
+
+[square]
+* Store your building block plays under `playbooks/bbX`
+* Store your playbook vars in `playbooks/vars/bbX.yml` file
+* Create documentation about building block in file `playbooks/docs/bbX.adoc`
+* Use https://gitlab.consulting.redhat.com/tigers/stc/blob/master/docs/bb_template.adoc[BB doc template] as template for your documentation.
+* Keep playbook simple. Better to make multiple small ones than one big one.
+
+
+=== Working with vars
+
+Default vars are stored in `playbooks/group_vars/all` file and will be included automatically to your plays.
+
+If you need to use data that is collected during installation, use env.yml. Add the following to your playbook:
+
+```
+...
+  vars_files:
+  - "{{file_env}}"
+...
+```

@@ -1,0 +1,59 @@
+- setup:
+    filter: ansible_devices
+- name: Figure out device reserved for docker
+  debug:
+    msg:
+      "{{item.value.partitions}}"
+  when: item.value.partitions == {}
+  register: disk_output
+  with_dict: "{{hostvars[inventory_hostname]['ansible_devices']}}"
+- set_fact:
+    docker_disk: "{% for result in disk_output.results if result.item.value.partitions == {} %}{{ result.item.key }}{% endfor %}"
+  when: docker_disk is not defined
+- name: Ensure docker installed
+  yum:
+    name: docker
+    state: latest
+- name: Ensure docker proxy settings
+  lineinfile:
+    dest: /etc/sysconfig/docker
+    state: present
+    line: "{{item[0]}}={{ item[1] }}"
+  with_together:
+  - ['HTTP_PROXY', 'HTTPS_PROXY', 'NO_PROXY']
+  - ["{{proxy_http}}", "{{proxy_https}}", "{{proxy_no}}"]
+  when: proxy_username is not defined and proxy_http is defined
+- name: Ensure docker proxy settings with username and password
+  lineinfile:
+    dest: /etc/sysconfig/docker
+    state: present
+    line: "{{item[0]}}=http://{{ proxy_username }}:{{ proxy_password }}@{{ item[1] }}"
+  with_together:
+  - ['HTTP_PROXY', 'HTTPS_PROXY', 'NO_PROXY']
+  - ["{{proxy_http}}", "{{proxy_https}}", "{{proxy_no}}"]
+  when: proxy_username is defined and proxy_http is defined
+- name: Detect Docker storage configuration status
+  command: grep -q overlay2 /etc/sysconfig/docker-storage
+  register: docker_storage_test
+  changed_when: false
+  failed_when: false
+- name: Create docker storage configuration
+  template:
+    src: templates/docker-storage-setup.j2
+    dest: /etc/sysconfig/docker-storage-setup
+  when: docker_storage_test.rc != 0
+
+- name: Apply Docker storage configuration changes
+  command: docker-storage-setup
+  when: docker_storage_test.rc != 0
+
+- name: Fail if Docker version is < {{docker_version}}
+  fail:
+    msg: 'docker_version must be >= 1.12, yours is set to {{ docker_version }}.'
+  when: docker_version | version_compare('1.12', '<')
+
+- name: Enable docker
+  command: systemctl enable docker
+
+- name: Start docker
+  command: systemctl start docker

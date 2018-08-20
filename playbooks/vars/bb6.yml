@@ -1,0 +1,9 @@
+dev_project: dev-project
+test_project: test-project
+prod_project: prod-project
+tag_prod: toprod
+tag_test: totest
+builder_image: redhat-openjdk18-openshift:1.1
+service_name: hello-ocp
+source: https://github.com/tahonen/hello-springboot.git
+source_branch: master

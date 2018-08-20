@@ -1,0 +1,25 @@
+- name: Register to RHSM
+  redhat_subscription:
+    state: present
+    username: "{{ rhn_username }}"
+    password: "{{ rhn_password }}"
+    pool_ids: "{{ subscription_pool_id }}"
+  register: subscribe
+  when: subscription_pool_id is defined
+- name: Register to Satellite
+  redhat_subscription:
+    state: present
+    activationkey: "{{ subscription_activationkey }}"
+    org_id: "{{ subscription_org_id }}"
+  register: subscribe_sat
+  when: subscription_org_id is defined and subscription_activationkey is defined and subscription_pool_id is not defined
+- name: Disable all repos
+  shell: |
+    subscription-manager repos --disable='*'
+  when: subscribe.changed or subscribe_sat.changed
+- name: Enable correct repos
+  shell: |
+    subscription-manager repos --enable='{{item}}'
+  with_items:
+  - "{{repos}}"
+  when: subscribe.changed or subscribe_sat.changed

@@ -1,0 +1,6 @@
+== Building Block 0 - Validate and prepare infrastructure
+This *Building Block* is targeted to ...
+
+=== Prerequisites for this Building Block
+
+=== Steps to Perform for this Building Block

@@ -1,0 +1,70 @@
+== Building Block 1 - Install Minimal Viable Product
+This *Building Block* is targeted to build a Red Hat Openshift cluster made out of
+
+ * 3 Master
+ * 3 Nodes
+
+=== Prerequisites for this Building Block
+To be able to run this *Building Block* you will have to successfully performed
+https://gitlab.consulting.redhat.com/tigers/stc/blob/master/docs/bb0.adoc[Building Block 0]
+
+=== Steps to Perform for this Building Block
+Please login to your *bastion* server and run the following commands
+
+```
+$ cd /tmp/ocppoc
+$ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/byo/config.yml
+```
+
+Once your output ends with
+
+```
+bastion                    : ok=117  changed=3    unreachable=0    failed=0
+localhost                  : ok=14   changed=0    unreachable=0    failed=0
+master01                   : ok=776  changed=111  unreachable=0    failed=0
+master02                   : ok=446  changed=48   unreachable=0    failed=0
+master03                   : ok=446  changed=48   unreachable=0    failed=0
+node01                     : ok=228  changed=18   unreachable=0    failed=0
+node02                     : ok=230  changed=28   unreachable=0    failed=0
+node03                     : ok=230  changed=28   unreachable=0    failed=0
+```
+
+you should have a running Red Hat OpenShift Enterprise cluster.
+
+=== Post Installation Tasks
+==== Create Admin-User
+If you want to change the password for `admin` user, which you should do, please
+run the following commands on your *bastion* server
+
+```
+[cloud-user@bastion ~]$ ansible -i inventory  masters -m command -a 'htpasswd -b /etc/origin/master/htpasswd admin change12_me'
+master01 | SUCCESS | rc=0 >>
+Adding password for user admin
+
+master03 | SUCCESS | rc=0 >>
+Adding password for user admin
+
+master02 | SUCCESS | rc=0 >>
+Adding password for user admin
+
+[cloud-user@bastion ~]$ ansible masters -l master01 -m command -a 'oc adm policy add-cluster-role-to-user cluster-admin admin'
+master01 | SUCCESS | rc=0 >>
+cluster role "cluster-admin" added: "admin"
+```
+
+This will
+
+  * change the way the user `admin` is authorized to `htpasswd`
+  * will give the user `admin` the password `change12_me`, which you can obviously
+  change to your liking
+  * will make user `admin` to a cluster-admin
+
+==== Add additional user
+If you want to add additional user to your Red Hat Openshift cluster, please do run the following commands
+
+```
+$ cd /tmp/ocppoc/
+$ ansible-playbook playbooks/bb1/add_user.yml
+```
+
+answer the questions for the name and password of the new user to complete this step.

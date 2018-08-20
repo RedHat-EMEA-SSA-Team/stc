@@ -1,0 +1,46 @@
+- name: Setup disconnected installation
+  hosts: bastion
+  gather_facts: no
+  vars_files:
+  - ../vars/bb4.yml
+  - ../group_vars/all
+  tasks:
+  - name: Install required packages
+    yum:
+      name: "{{item}}"
+      state: present
+    with_items: "{{registry_packages}}"
+  - name: Configure Docker Registry
+    template:
+      src: templates/config.j2
+      dest: "{{registry_path}}/{{registry_conf}}"
+  - name: Generate Registry certificates
+    shell: openssl req -x509 -newkey rsa:4096 -nodes -sha256 -days 3650 -keyout cert.key -out cert.cert -subj "/CN={{registry.split(':')[0]}}"
+    args:
+      chdir: "{{registry_path}}"
+    register: cert_gen
+  - name: Create Registry dir in /etc/docker/certs.d/
+    file:
+      path:  "/etc/docker/certs.d/{{registry.split(':')[0]}}"
+      state: directory
+      mode: 0755
+  - name: Create a symlink inside /etc/docker/certs.d/ for generate certs
+    file:
+      src: "{{registry_path}}/cert.cert"
+      dest: "/etc/docker/certs.d/{{registry.split(':')[0]}}/cert.crt"
+      state: link
+  - name: Start and enable Docker Registry
+    shell: systemctl enable docker-distribution && systemctl start docker-distribution
+    register: registry_stat
+  - name: Create script to sync images
+    template:
+      src: templates/local-registry-setup-v2.j2
+      dest: /tmp/local-registry-setup-v2
+      mode: 0755
+  - name: Sync images
+    shell: /tmp/local-registry-setup-v2 > /tmp/sync
+    register: sync
+
+
+ 
+

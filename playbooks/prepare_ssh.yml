@@ -1,0 +1,36 @@
+---
+- name: Collect information about subscription and remote user
+  hosts: localhost
+  gather_facts: no
+  vars_files:
+  - "{{file_env}}"
+  tasks:
+  - name: Create key for remote user
+    user:
+      name: "{{ssh_user}}"
+      generate_ssh_key: yes
+      ssh_key_bits: 2048
+      ssh_key_file: .ssh/id_rsa
+- name: Distribute public keys and populate known_hosts
+  gather_facts: no
+  hosts: all
+  vars_files:
+  - "{{file_env}}"
+  tasks:
+  - set_fact:
+      ssh_dir: /root/.ssh
+    when: ssh_user == 'root'
+  - set_fact:
+      ssh_dir: "/home/{{ssh_user}}/.ssh"
+    when: ssh_user != 'root'
+  - name: Remove old known_hosts
+    file:
+      path: "{{ssh_dir}}/known_hosts"
+      state: absent
+  - name: Add key to authorized_keys
+    authorized_key:
+      user: "{{ssh_user}}"
+      state: present
+      key: "{{ lookup('file', ssh_dir+'/id_rsa.pub') }}"
+  - name: Run ssh-keyscan to add keys to known_hosts
+    local_action: "shell ssh-keyscan {{ inventory_hostname }} >> {{ssh_dir}}/known_hosts"

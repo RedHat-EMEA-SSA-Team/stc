@@ -1,0 +1,9 @@
+---
+- name: Prepare install and validate docker
+  hosts: nodes
+  gather_facts: yes
+  vars_files:
+  - "{{file_env}}"
+  roles:
+  - check_docker_setup
+  - check_docker_validation

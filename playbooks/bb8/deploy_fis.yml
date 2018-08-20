@@ -1,0 +1,55 @@
+- name: Deploy Monitoring
+  hosts: masters[0]
+  vars:
+    BASEURL: https://raw.githubusercontent.com/jboss-fuse/application-templates/GA
+  gather_facts: no
+  tasks:
+
+   - name: Switch to project 'Openshift'
+     command: oc project openshift
+
+   - name: Update FIS ImageStream
+     command: oc replace --force -n openshift -f {{BASEURL}}/fis-image-streams.json
+
+   - name: Update karaf2-camel-amq-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/karaf2-camel-amq-template.json
+
+   - name: Update karaf2-camel-log-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/karaf2-camel-log-template.json
+
+   - name: Update karaf2-camel-rest-sql-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/karaf2-camel-rest-sql-template.json
+
+   - name: Update karaf2-cxf-rest-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/karaf2-cxf-rest-template.json
+
+   - name: Update spring-boot-camel-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/spring-boot-camel-template.json
+
+   - name: Update spring-boot-camel-amq-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/spring-boot-camel-amq-template.json
+
+   - name: Update spring-boot-camel-config-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/spring-boot-camel-config-template.json
+
+   - name: Update spring-boot-camel-drools-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/spring-boot-camel-drools-template.json
+
+   - name: Update spring-boot-camel-infinispan-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/spring-boot-camel-infinispan-template.json
+
+   - name: Update spring-boot-camel-rest-sql-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/spring-boot-camel-rest-sql-template.json
+
+   - name: Update spring-boot-camel-teiid-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/spring-boot-camel-teiid-template.json
+
+   - name: Update spring-boot-camel-xml-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/spring-boot-camel-xml-template.json
+
+   - name: Update spring-boot-cxf-jaxws-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/spring-boot-cxf-jaxws-template.json
+
+   - name: Update spring-boot-cxf-jaxws-template
+     command: oc replace --force -n openshift -f {{BASEURL}}/quickstarts/spring-boot-cxf-jaxws-template.json
+

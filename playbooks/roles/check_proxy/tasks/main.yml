@@ -1,0 +1,39 @@
+- name: ensure proxy settings uppercase with username and password
+  lineinfile:
+    dest: /etc/environment
+    state: present
+    line: "{{item[0]}}={{ proxy_username }}:{{ proxy_password }}@{{ item[1] }}"
+  with_together:
+  - "{{ proxy_uc_envs }}"
+  - "{{ proxies }}"
+  when: proxy_username is defined and proxy_http is defined
+- name: ensure proxy settings uppercase
+  lineinfile:
+    dest: /etc/environment
+    state: present
+    line: "{{item[0]}}={{ item[1] }}"
+  with_together:
+  - "{{ proxy_uc_envs }}"
+  - "{{ proxies }}"
+  when: proxy_username is not defined and proxy_http is defined
+- name: ensure proxy settings lowercase with username and password
+  lineinfile:
+    dest: /etc/environment
+    state: present
+    line: "{{item[0]}}={{ proxy_username }}:{{ proxy_password }}@{{ item[1] }}"
+  with_together:
+  - "{{ proxy_lc_envs }}"
+  - "{{ proxies }}"
+  when: proxy_username is defined and proxy_http is defined
+- name: ensure proxy settings lowercase
+  lineinfile:
+    dest: /etc/environment
+    state: present
+    line: "{{item[0]}}={{ item[1] }}"
+  with_together:
+  - "{{ proxy_lc_envs }}"
+  - "{{ proxies }}"
+  when: proxy_username is not defined and proxy_http is defined
+
+
+

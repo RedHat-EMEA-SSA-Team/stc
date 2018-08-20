@@ -1,0 +1,495 @@
+== Building Block 0 - Validate and prepare infrastructure
+This *Building Block* is targeted to verify a given environent
+before attempting to install Red Hat OpenShift.
+
+While running this *Building Block* the following technical prerequisites will be verified
+
+* each system having at least 2 CPU-Cores ( physical or virtual )
+* each system having at least 16GB RAM
+* each system having at least 10GB of Disk Storage under /
+* each system having at least 40GB of Disk Storage under /var
+* each system having at least 15GB of Disk Storage under empty device for container storage (e.g. /dev/vdb)
+* if used, each system that need to host OCS having at least 100GB of raw disk (e.g. /dev/vdc)
+
+Hardware requirements are based on official https://docs.openshift.com/container-platform/latest/install_config/install/prerequisites.html#production-level-hardware-requirements[OCP documentation]
+
+=== Prerequisites for this Building Block
+To be able to run this *Building Block* we recommend to prepare the
+following systems
+
+* 1 RHEL Server as *Bastion*
+* 3 RHEL Servers as *Red Hat Openshift Master* incl. Infrastructure Container
+* 3 RHEL Server as *Red Hat Openshift Nodes* incl. Router Container
+
+These systems can be bare metal or virtual server running on any hypervisor.
+
+Topology can be modified if a smaller or greater number of node is required (minimum 4 nodes).
+
+NOTE: Please be aware that currently Red Hat Openshift expects a minimum of
+2 CPU Cores and 16GB of RAM per node.
+
+=== Steps to Perform for this Building Block
+
+==== Prepare Configuration File
+As a first step, you need to create a configuration YAML file named `env.yml`, describing your
+environment. Based on this file, this *Building Block* will perform a set of
+verification steps.
+
+To make the creation of this configuration YAML file as easy as possible,
+we provided a simple script ad STC Installer for you:
+
+```
+$ ./setup.sh 
+```
+
+Please fill in the following information into the script when prompted, default value are inside []
+
+
+* Hardware Requirements: If your infrastructure respect hardware requirements 
+* OCP Version: Select OpenShift version, default is 3.9
+* Cluster hostname (API DNS):  Hostname under which your Red Hat Openshift cluster
+will be accessible after installation
+Wilcard DNS for Apps: DNS-Record as entered in your DNS Server to catch all future applications
+running on Red Hat Openshift
+* Cluster Topology: Standard STC topology is 7 hosts, use default values to have it or change as your needs
+* Bastion hostname: The hostname of jumphost to run validation and installation
+* Load Balancer hostname: The hostname if any Load Balancer node to configure, this will install HAProxy on this node
+* Number of Master Nodes and Masters Nodes Hostnames: Default to 3, other option is 1
+* Number of Infra Nodes and Infra Nodes Nodes Hostnames: Optional, leave it blank or select 1,3
+* Number of Compute Nodes and Compute Nodes Hostnames: Default to 3, other option is 1,2,3
+* Proxy support: Enable proxy access for OpenShift services, Docker, Git and environments configuration
+* Internet proxy HTTP: Hostname and Port of your HTTP
+for outside connectivity.
+* Internet proxy HTTPS: Hostname and Port of your HTTP Proxy, if one is needed
+for outside connectivity.
+* No proxy: Select host to skip for proxing
+* Proxy username: Username in case you need to authenticate with the Proxies
+defined in the previous fields.
+* Install OCS (formely knows as Container Native Storage): Validate and prepare nodes for Glusterfs
+* Number of OCS Nodes and OCS Nodes Hostnames: Select 3 masters or 3 nodes of your choice
+* Remote SSH user: Remote user which is used to access all hosts used
+for Openshift. Must have sudo access on hosts. Defaults to root.
+* Red Hat account username: your accountname on the Red Hat website.
+* Remote SSL user: Remote user which is used to access all hosts used
+for Openshift. Must have sudo access on hosts. Defaults to root.
+* How do you manage your subscription and repositories: Select RHSM for direct access to Red Hat CDN for 
+Subscription Management or select Satellite if present
+* RHSM Username: Select your RHSM Username, password will be asked and stored in Ansible Vault later
+* Satellie Org ID and Activation Key: Provide an Org ID and an Acivation Key which containers OpenShift required repositories through
+a properly configured Content View
+
+The content of this YAML will be generated in the stc directory and used by the installer, if you agreed to proceed with `y` option, the validation will start:
+
+```
+Generated configuration:
+
+********************* STC Conf file *********************
+ocp_version: 3.9
+api_dns: openshift.example.com
+apps_dns: apps.example.com
+bastion: bastion.example.com
+lb: bastion.example,com
+masters:
+- master01.example.com
+- master02.example.com
+- master03.example.com
+nodes:
+- node01.example.com
+- node02.example.com
+- node03.example.com
+proxy_http: http://proxy.example.com:3128
+proxy_https: http://proxy.example.com:3128
+proxy_no: proxy.example.com,127.0.0.1,localhost
+cns:
+- master01.example.com
+- master02.example.com
+- master03.example.com
+ssh_user: cloud-user
+subscription_activationkey: ocp39
+subscription_org_id: RedHat
+****************** End STC Conf file ********************
+
+Do you want to proceed?
+y n
+
+```
+
+
+
+Other Example with standard STC topology (nodes contains router and registry):
+
+```
+ocp_version: 3.9
+lb: bastion
+nfs: bastion
+bastion: bastion
+masters:
+- master01
+- master02
+- master03
+nodes:
+- node01
+- node02
+- node03
+ssh_user: cloud-user
+apps_dns: apps.your-ip.nip.io  
+api_dns: master.your-ip.nip.io 
+rhn_username: username
+```
+
+Example with smaller topology and infranodes, with version 3.10
+
+```
+ocp_version: 3.10
+bastion: bastion
+masters:
+- master01
+infranodes:
+- infranode01
+nodes:
+- node01
+ssh_user: cloud-user
+proxy_http: 'http://proxy.company.local:3128'
+proxy_https: 'http://proxy.company.local:3128'
+proxy_no: 'satellite.company.local,localhost,127.0.0.1'
+apps_dns: apps.company.local    
+api_dns: master01.company.local    
+rhn_username: username
+```
+
+==== Download Scripts and Playbooks
+With the YAML Configuration file ready, you will now have to download the
+scripts and Ansible Playbooks. To do so, please run the following commands
+on your *Bastion* server as `root`.
+
+```
+wget -c http://bit.ly/stc-tigers
+tar xvf archive.tar.b2
+cd stc*
+chmod +x setup.sh
+
+```
+
+==== Setup bastion host and  validate configuration
+In this step, we will be using a script to
+
+* prepare the *Bastion* system
+* verify the correctness of the created YAML Configuration file
+
+To do so, please run the following command on your *Bastion* server  as `root` or as sudoers user.
+
+```
+./setup.sh
+```
+
+The script will ask you:
+
+* If hardware requirements are met, if not you need to skip hardware requiments check with option: n
+* Which version of OpenShift to prepare for prerequisites and verify, defaults to 3.9
+* Which type of Subscription management to use in order to register hosts, default is RHSM (need access to Red Hat CDN), and also Satellite giving an Organization ID and an Activation Key
+
+After this it will start registering Bastion host and start the validation across nodes, preparing an inventory file to be used to install OCP later on.
+
+```
+ ____ _____ ____ 
+/ ___|_   _/ ___|
+\___ \ | || |    
+ ___) || || |___ 
+|____/ |_| \____|
+                 
+
+
+Welcome to STC OpenShift Installation Validator
+Defaults value are shown in []
+
+Are Hardware Requirements satisfied? Min. 16 GB RAM and 2 CPU
+[y] n
+n
+Please select OCP Version to install: 3.10, 3.9 or 3.7
+3.10 [3.9] 3.7
+
+*** selected 3.9 
+
+Please insert Cluster hostname (API DNS):
+openshift.example.com
+Please insert Wilcard DNS for Apps:
+apps.example.com
+
+Cluster Topology Setup
+
+Please insert Bastion Node hostname:
+bastion.example.com
+Please insert a Load Balancer Node hostname (leave it blank if not needed or external Balancer is present, for e.g. pick bastion if needed):
+bastion.example,com
+Please insert number of Masters (1 or 3):
+1 [3]
+
+Please insert Master 1 hostname:
+master01.example.com
+Please insert Master 2 hostname:
+master02.example.com
+Please insert Master 3 hostname:
+master03.example.com
+Please insert number of Infranodes (0 or 3, leave blank if App nodes are also Infranodes):
+
+Please insert number of Nodes (1, 2 or 3):
+1 2 [3]
+
+Please insert Node 1 hostname:
+node01.example.com
+Please insert Node 2 hostname:
+node02.example.com
+Please insert Node 3 hostname:
+node03.example.com
+Is there any Proxy to use for OpenShift and Container Runtime?
+y [n]
+y
+Please insert HTTP Proxy:
+http://proxy.example.com:3128
+Please insert HTTPS Proxy:
+http://proxy.example.com:3128
+Please insert No Proxy (leave blank if any)
+proxy.example.com,127.0.0.1,localhost
+Please insert Proxy Username (leave blank if any)
+
+Please insert Proxy Password (leave blank if any)
+
+
+Install OCS (formerly known as CNS)?
+[y] n
+
+Please insert OCS Node 1 hostname (e.g. pick masters, infra or nodes):
+master01.example.com
+Please insert OCS Node 2 hostname (e.g. pick masters, infra or nodes):
+master02.example.com
+Please insert OCS Node 3 hostname (e.g. pick masters, infra or nodes):
+master03.example.com
+Please insert SSH username to be used by Ansible:
+cloud-user
+Please select Subscription management: RHSM or Satellite
+[rhsm] satellite
+satellite
+*** registering host to Satellite
+Please insert Organization ID:
+RedHat
+
+Please insert Activation Key:
+ocp39
+
+
+Generated configuration:
+
+********************* STC Conf file *********************
+ocp_version: 3.9
+api_dns: openshift.example.com
+apps_dns: apps.example.com
+bastion: bastion.example.com
+lb: bastion.example,com
+masters:
+- master01.example.com
+- master02.example.com
+- master03.example.com
+nodes:
+- node01.example.com
+- node02.example.com
+- node03.example.com
+proxy_http: http://proxy.example.com:3128
+proxy_https: http://proxy.example.com:3128
+proxy_no: proxy.example.com,127.0.0.1,localhost
+cns:
+- master01.example.com
+- master02.example.com
+- master03.example.com
+ssh_user: cloud-user
+subscription_activationkey: ocp39
+subscription_org_id: RedHat
+****************** End STC Conf file ********************
+
+Do you want to proceed?
+y n
+
+
+PLAY RECAP *********************************************************************
+localhost                  : ok=1    changed=0    unreachable=0    failed=0
+```
+
+You will also be asked to provide a password to `ssh` into the 7 systems and for
+a password, which will be used to encrypt all given passwords during installation
+and later steps.
+
+==== Test Ansible inventory and public key authentication
+To verify that our previous steps worked and that the public keys have all been
+successfully transfered to the 7 systems, please run the following
+
+```
+ansible -i inventory all -m ping
+```
+
+you should get the following output
+
+```
+master01.example.com | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+master02.example.com | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+master03.example.com | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+node01.example.com | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+node02.example.com | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+node03.example.com | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+bastion.example.com | SUCCESS => {
+    "changed": false,
+    "ping": "pong"
+}
+[root@localhost ocppoc]#
+```
+
+==== Validate nodes and external connections for OCP
+In the final step, we will run the real validation.
+To do so, please run
+
+```
+ansible-playbook -i inventory --ask-vault-pass playbooks/validate.yml
+```
+
+If all steps perform without raising an error, then you are ready to
+proceed and install Red Hat Openshift.
+
+```
+PLAY [Validate environment] ****************************************************
+
+PLAY [Verify subcription and subscribe nodes] **********************************
+
+TASK [Check Red Hat subscription] **********************************************
+< output removed >
+
+TASK [Disable all repos] *******************************************************
+< output removed >
+
+TASK [Enable correct repos] ****************************************************
+< output removed >
+
+PLAY [Check supported Operating Systems] ***************************************
+
+TASK [Gathering Facts] *********************************************************
+< output removed >
+
+TASK [assert] ******************************************************************
+< output removed >
+
+PLAY [Check connectivity to whitelisted hosts] *********************************
+
+TASK [Ping proxy whitelisted sites] ********************************************
+< output removed >
+
+TASK [Check download speed] ****************************************************
+< output removed >
+
+TASK [set_fact] ****************************************************************
+< output removed >
+
+TASK [debug] *******************************************************************
+< output removed >
+
+TASK [Ensude nc is installed] **************************************************
+< output removed >
+
+TASK [Start nc -l to all valid ports] ******************************************
+< output removed >
+
+PLAY [Check all ports from bastion] ********************************************
+
+TASK [Check that all needed ports are open] ************************************
+< output removed >
+
+TASK [Ensure nc absent] ********************************************************
+< output removed >
+
+PLAY [Vadiate that selinux is in place] ****************************************
+
+TASK [check if selinux is running and enforced] ********************************
+< output removed >
+
+PLAY [Identify the space available in] *****************************************
+
+TASK [command] *****************************************************************
+< output removed >
+
+TASK [Set root disk facts] *****************************************************
+< output removed >
+
+TASK [Fail if there is not enough space available in /] ************************
+< output removed >
+
+PLAY [Check if Network Manager is running] *************************************
+
+TASK [Ensure that NetworkManager is running] ***********************************
+< output removed >
+
+TASK [Report status of Network Manager] ****************************************
+< output removed >
+
+PLAY [Prepare install and validate docker] *************************************
+
+TASK [Gathering Facts] *********************************************************
+< output removed >
+
+TASK [docker_setup : setup] ****************************************************
+< output removed >
+
+TASK [docker_setup : Figure out device reserved for docker] ********************
+< output removed >
+
+TASK [docker_setup : set_fact] *************************************************
+< output removed >
+
+TASK [docker_setup : Ensure docker installed] **********************************
+< output removed >
+
+TASK [docker_setup : Detect Docker storage configuration status] ***************
+< output removed >
+
+TASK [docker_setup : Create docker storage configuration] **********************
+< output removed >
+
+TASK [docker_setup : Apply Docker storage configuration changes] ***************
+< output removed >
+
+TASK [docker_setup : Fail if Docker version is < 1.12] *************************
+< output removed >
+
+TASK [docker_setup : Enable docker] ********************************************
+< output removed >
+
+TASK [docker_setup : Start docker] *********************************************
+< output removed >
+
+TASK [docker_validation : Pull some basic docker images] ***********************
+< output removed >
+
+PLAY RECAP *********************************************************************
+bastion                    : ok=8    changed=0    unreachable=0    failed=0
+localhost                  : ok=1    changed=0    unreachable=0    failed=0
+master01                   : ok=28   changed=8    unreachable=0    failed=0
+master02                   : ok=28   changed=8    unreachable=0    failed=0
+master03                   : ok=28   changed=8    unreachable=0    failed=0
+node01                     : ok=28   changed=8    unreachable=0    failed=0
+node02                     : ok=28   changed=8    unreachable=0    failed=0
+node03                     : ok=28   changed=8    unreachable=0    failed=0
+
+```
