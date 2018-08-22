@@ -70,5 +70,5 @@
 
   - name: Create Inventory file based on dynamic collected information.
     template:
-      src: templates/hosts.j2
+      src: "templates/hosts-v{{'%0.2f'| format(ocp_version|float)}}.j2"
       dest: "{{file_inventory}}"

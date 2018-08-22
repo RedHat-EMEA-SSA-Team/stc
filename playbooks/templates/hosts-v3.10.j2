@@ -1,0 +1,210 @@
+# Create an OSEv3 group that contains the masters and nodes groups
+[OSEv3:children]
+masters
+nodes
+etcd
+{% if lb is defined %}
+lb
+{% endif %}
+bastion
+{% if cns is defined %}
+glusterfs
+{% endif %}
+
+# Set variables common for all OSEv3 hosts
+[OSEv3:vars]
+ansible_ssh_user={{ssh_user}}
+ansible_become={% if ssh_user == "root" %}no{% else %}yes{% endif %}
+
+# https://github.com/openshift/openshift-ansible/blob/master/DEPLOYMENT_TYPES.md
+deployment_type=openshift-enterprise
+containerized=false
+
+# Skip env validation
+openshift_disable_check=disk_availability,memory_availability
+
+# Configure usage of openshift_clock role.
+openshift_clock_enabled=true
+
+# Set upgrade restart mode for full system restarts
+openshift_rolling_restart_mode=system
+
+# Enable cockpit
+osm_use_cockpit=false
+osm_cockpit_plugins=['cockpit-kubernetes', 'cockpit-pcp', 'setroubleshoot-server']
+
+# Docker / Registry Configuration
+openshift_docker_disable_push_dockerhub=True
+openshift_docker_options="--log-driver=journald --log-level=warn --ipv6=false"
+openshift_docker_insecure_registries=docker-registry.default.svc,docker-registry.default.svc.cluster.local
+
+# Native high availability cluster method with optional load balancer.
+
+openshift_master_cluster_method=native
+openshift_master_cluster_hostname={{api_dns}}
+openshift_master_cluster_public_hostname={{api_dns}}
+openshift_master_api_port=8443
+openshift_master_console_port=8443
+
+
+# Configure nodeIP in the node config
+# This is needed in cases where node traffic is desired to go over an
+# interface other than the default network interface.
+
+# Configure the multi-tenant SDN plugin (default is 'redhat/openshift-ovs-subnet')
+os_sdn_network_plugin_name=redhat/openshift-ovs-multitenant
+
+# Configure SDN cluster network and kubernetes service CIDR blocks. These
+# network blocks should be private and should not conflict with network blocks
+# in your infrastructure that pods may require access to. Can not be changed
+# after deployment.
+osm_cluster_network_cidr=10.1.0.0/16
+openshift_portal_net=172.30.0.0/16
+osm_host_subnet_length=8
+
+#Proxy
+{% if proxy_http is defined %}
+openshift_http_proxy={% if proxy_username is defined %}{{proxy_username}}{% if proxy_password is defined %}:{{proxy_password}}{% endif %}@{% endif %}{{proxy_http}}
+{% endif %}
+{% if proxy_https is defined %}
+openshift_https_proxy={% if proxy_username is defined %}{{proxy_username}}{% if proxy_password is defined %}:{{proxy_password}}{% endif %}@{% endif %}{{proxy_https}}
+{% endif %}
+{% if proxy_no is defined %}
+openshift_no_proxy='{{proxy_no}}'
+{% endif %}
+openshift_generate_no_proxy_hosts=true
+
+# htpasswd auth
+openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
+
+# Provide local certificate paths which will be deployed to masters
+openshift_master_overwrite_named_certificates=true
+
+# Install the openshift examples
+openshift_install_examples=true
+openshift_examples_modify_imagestreams=true
+
+# default subdomain to use for exposed routes
+openshift_master_default_subdomain={{ apps_dns | replace("*.","")  }}
+
+# Openshift Registry Options
+openshift_hosted_registry_storage_kind=glusterfs
+openshift_hosted_registry_replicas=1
+
+#OCS
+openshift_storage_glusterfs_namespace=ocs
+openshift_storage_glusterfs_name=ocs
+openshift_storage_glusterfs_wipe=True
+openshift_storage_glusterfs_storageclass=true
+openshift_storage_glusterfs_storageclass_default=true
+openshift_storage_glusterfs_image=registry.access.redhat.com/rhgs3/rhgs-server-rhel7
+openshift_storage_glusterfs_heketi_image=registry.access.redhat.com/rhgs3/rhgs-volmanager-rhel7
+openshift_storage_glusterfs_block_deploy=True
+openshift_storage_glusterfs_block_host_vol_create=true
+openshift_storage_glusterfs_block_host_vol_size=50
+openshift_storage_glusterfs_block_storageclass=true
+
+# Metrics deployment
+openshift_metrics_install_metrics=true
+openshift_metrics_hawkular_hostname=metrics.{{ apps_dns | replace("*.","")}}
+openshift_metrics_cassandra_replicas=1
+openshift_metrics_cassandra_limits_memory=2Gi
+openshift_metrics_hawkular_replicas=1
+openshift_metrics_duration=5
+openshift_metrics_cassandra_pvc_size=5Gi
+openshift_metrics_cassandra_storage_type=dynamic
+openshift_metrics_cassanda_pvc_storage_class_name=glusterfs-ocs-block
+
+# Logging deployment
+openshift_logging_install_logging=true
+openshift_logging_kibana_hostname=logging.{{ apps_dns | replace("*.","")  }}
+openshift_logging_use_ops=false
+openshift_logging_public_master_url=https://{{api_dns}}
+openshift_logging_curator_default_days=7
+openshift_logging_es_pvc_size=20Gi
+openshift_logging_es_pvc_dynamic=true
+openshift_logging_es_pvc_storage_class_name=glusterfs-ocs-block
+
+# Prometheus
+openshift_hosted_prometheus_deploy=true
+openshift_prometheus_namespace=openshift-metrics
+openshift_prometheus_storage_kind=dynamic
+openshift_prometheus_storage_volume_name=prometheus
+openshift_prometheus_storage_volume_size=10Gi
+openshift_prometheus_storage_type='pvc
+openshift_prometheus_storage_class=glusterfs-ocs-block'
+openshift_prometheus_alertmanager_storage_kind=dynamic
+openshift_prometheus_alertmanager_storage_volume_name=prometheus-alertmanager
+openshift_prometheus_alertmanager_storage_volume_size=5Gi
+openshift_prometheus_alertmanager_storage_type='pvc'
+openshift_prometheus_alertmanager_storage_class=glusterfs-ocs-block
+openshift_prometheus_alertbuffer_storage_kind=dynamic
+openshift_prometheus_alertbuffer_storage_volume_name=prometheus-alertbuffer
+openshift_prometheus_alertbuffer_storage_volume_size=5Gi
+openshift_prometheus_alertbuffer_storage_type='pvc'
+openshift_prometheus_alertbuffer_storage_class=glusterfs-ocs-block
+
+# Service brokers
+openshift_enable_service_catalog=true
+ansible_service_broker_install=true
+template_service_broker_install=true
+dynamic_volumes_check=false
+openshift_storageclass_name=glusterfs-cns
+openshift_service_catalog_image_version=latest
+ansible_service_broker_image_prefix=registry.access.redhat.com/openshift3/ose-
+ansible_service_broker_registry_url="registry.access.redhat.com"
+openshift_service_catalog_image_prefix=registry.access.redhat.com/openshift3/ose-
+openshift_template_service_broker_namespaces=['openshift']
+openshift_hosted_etcd_storage_kind=dynamic
+openshift_hosted_etcd_storage_volume_name=etcd-vol
+openshift_hosted_etcd_storage_access_modes=["ReadWriteOnce"]
+openshift_hosted_etcd_storage_volume_size=1Gi
+openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
+
+
+# Grafana
+openshift_grafana_storage_type=pvc
+openshift_grafana_sc_name=glusterfs-cns
+openshift_grafana_storage_volume_size=1Gi
+
+
+[masters]
+{% for master in masters %}
+{{master}}
+{% endfor %}
+
+[etcd]
+{% for master in masters %}
+{{master}}
+{% endfor %}
+
+{% if lb is defined %}
+[lb]
+{{lb}}
+{% endif %}
+
+[glusterfs]
+{% for cns_node in cns %}
+{{cns_node}} glusterfs_ip={{ cns_hosts[loop.index0] }} glusterfs_devices='["/dev/vdc"]'
+{% endfor %}
+
+
+[nodes]
+{% for master in masters %}
+{{master}} openshift_node_group_name='{% if infranodes is defined %}node-config-master{% endif %}{% if infranodes is not defined %}node-config-master-infra{% endif %}'
+{% endfor %}
+
+{% if infranodes is defined %}
+{% for infra_node in infranodes %}
+{{infra_node}} openshift_node_group_name='node-config-infra'
+{% endfor %}
+{% endif %}
+
+{% for node in nodes %}
+{{node}} openshift_node_group_name='node-config-compute'
+{% endfor %}
+
+[bastion]
+{% if bastion is defined %}
+{{bastion}}
+{% endif %}

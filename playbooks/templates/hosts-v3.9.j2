@@ -10,6 +10,7 @@ bastion
 {% if cns is defined %}
 glusterfs
 {% endif %}
+
 # Set variables common for all OSEv3 hosts
 [OSEv3:vars]
 ansible_ssh_user={{ssh_user}}
@@ -74,11 +75,7 @@ openshift_no_proxy='{{proxy_no}}'
 openshift_generate_no_proxy_hosts=true
 
 # htpasswd auth
-{% if '%0.2f'| format(ocp_version|float) == '3.10' %}
-openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider'}]
-{% else %}
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
-{% endif %}
 
 # Provide local certificate paths which will be deployed to masters
 openshift_master_overwrite_named_certificates=true
@@ -91,14 +88,10 @@ openshift_examples_modify_imagestreams=true
 openshift_master_default_subdomain={{ apps_dns | replace("*.","")  }}
 
 # default project node selector
-{% if '%0.2f'| format(ocp_version|float) == '3.10' %}
 osm_default_node_selector='purpose=apps'
-{% endif %}
 
 # OpenShift Router Options
-{% if '%0.2f'| format(ocp_version|float) == '3.10' %}
 openshift_hosted_router_selector='target=router'
-{% endif %}
 
 # Openshift Registry Options
 openshift_hosted_registry_storage_kind=glusterfs
@@ -112,7 +105,6 @@ openshift_storage_glusterfs_storageclass=true
 openshift_storage_glusterfs_storageclass_default=true
 openshift_storage_glusterfs_image=registry.access.redhat.com/rhgs3/rhgs-server-rhel7
 openshift_storage_glusterfs_heketi_image=registry.access.redhat.com/rhgs3/rhgs-volmanager-rhel7
-openshift_storage_glusterfs_heketi_version=v{{ '%0.2f'| format(ocp_version|float)  if '%0.2f'| format(ocp_version|float) == '3.10'  else ocp_version }}
 openshift_storage_glusterfs_block_deploy=True
 openshift_storage_glusterfs_block_host_vol_create=true
 openshift_storage_glusterfs_block_host_vol_size=50
@@ -130,11 +122,9 @@ openshift_metrics_cassandra_pvc_size=5Gi
 openshift_metrics_cassandra_storage_type=dynamic
 openshift_metrics_cassanda_pvc_storage_class_name=glusterfs-ocs-block
 
-{% if '%0.2f'| format(ocp_version|float) != '3.10' %}
 openshift_metrics_cassandra_nodeselector={"region":"infra"}
 openshift_metrics_hawkular_nodeselector={"region":"infra"}
 openshift_metrics_heapster_nodeselector={"region":"infra"}
-{% endif %}
 
 # Logging deployment
 openshift_logging_install_logging=true
@@ -146,19 +136,14 @@ openshift_logging_es_pvc_size=20Gi
 openshift_logging_es_pvc_dynamic=true
 openshift_logging_es_pvc_storage_class_name=glusterfs-ocs-block
 
-{% if '%0.2f'| format(ocp_version|float) != '3.10' %}
 openshift_logging_curator_nodeselector={"region":"infra"}
 openshift_logging_es_nodeselector={"region":"infra"}
 openshift_logging_kibana_nodeselector={"region":"infra"}
-{% endif %}
 
 # Prometheus
 openshift_hosted_prometheus_deploy=true
 openshift_prometheus_namespace=openshift-metrics
-{% if '%0.2f'| format(ocp_version|float) != '3.10' %}
 openshift_prometheus_node_selector={"region":"infra"}
-{% endif %}
-{% if cns is defined %}
 openshift_prometheus_storage_kind=dynamic
 openshift_prometheus_storage_volume_name=prometheus
 openshift_prometheus_storage_volume_size=10Gi
@@ -174,14 +159,12 @@ openshift_prometheus_alertbuffer_storage_volume_name=prometheus-alertbuffer
 openshift_prometheus_alertbuffer_storage_volume_size=5Gi
 openshift_prometheus_alertbuffer_storage_type='pvc'
 openshift_prometheus_alertbuffer_storage_class=glusterfs-ocs-block
-{% endif %}
 
-{% if cns is defined %}
+
 # Grafana
 openshift_grafana_storage_type=pvc
 openshift_grafana_sc_name=glusterfs-cns
 openshift_grafana_storage_volume_size=1Gi
-{% endif %}
 
 
 [masters]
@@ -209,27 +192,17 @@ openshift_grafana_storage_volume_size=1Gi
 
 [nodes]
 {% for master in masters %}
-{% if '%0.2f'| format(ocp_version|float) == '3.10' %}
-{{master}} openshift_node_group_name='{% if infranodes is defined %}node-config-master{% endif %}{% if infranodes is not defined %}node-config-master-infra{% endif %}'
-{% else %}
-{{master}} openshift_node_labels="{'region':'primary', 'zone': '{{loop.index}}'}" openshift_schedulable=true
-{% endif %}
+{{master}} openshift_node_labels="{'region':'primary', 'zone': '{{loop.index}}'} {% if infranodes is not defined %}, 'region: 'infra', 'target': 'router'{%endif}" openshift_schedulable=true
 {% endfor %}
 
+{% if infranodes is defined %}
 {% for infra_node in infranodes %}
-{% if '%0.2f'| format(ocp_version|float) == '3.10' %}
-{{infra_node}} openshift_node_group_name='node-config-infra'
-{% else %}
 {{infra_node}} openshift_node_labels="{'region':'infra', 'zone':'{{loop.index}}', 'target':'router'}"
-{% endif %}
 {% endfor %}
+{% endif %}
 
 {% for node in nodes %}
-{% if '%0.2f'| format(ocp_version|float) == '3.10' %}
-{{node}} openshift_node_group_name='node-config-compute'
-{% else %}
 {{node}} openshift_node_labels="{'region': 'primary', 'purpose':'apps'}"
-{% endif %}
 {% endfor %}
 
 [bastion]
