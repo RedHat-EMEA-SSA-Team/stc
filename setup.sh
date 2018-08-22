@@ -5,12 +5,12 @@ CNS_NODES=3
 
 
 cat << EOF
- ____ _____ ____ 
+ ____ _____ ____
 / ___|_   _/ ___|
-\___ \ | || |    
- ___) || || |___ 
+\___ \ | || |
+ ___) || || |___
 |____/ |_| \____|
-                 
+
 
 EOF
 
@@ -39,7 +39,7 @@ case "$ocp_version" in
 esac
 
 
-sed -Ei "s/ocp_version: (.*)/ocp_version: \"$OCP_VERSION\"/" playbooks/group_vars/all 
+sed -Ei "s/ocp_version: (.*)/ocp_version: \"$OCP_VERSION\"/" playbooks/group_vars/all
 
 echo "ocp_version: $OCP_VERSION" > env.yml
 
@@ -112,7 +112,7 @@ done
 
 
 
-echo "Please insert number of Infranodes (0 or 3, leave blank if App nodes are also Infranodes):"
+echo "Please insert number of Infranodes (0 or 3, leave blank if Master nodes are also Infranodes):"
 
 read -r n_infranodes
 
@@ -186,7 +186,7 @@ if [[ $has_proxy == "y"  ]]; then
 
         echo "Please insert No Proxy (leave blank if any)"
         read -r proxy_no
-	
+
 	if [ -n "$proxy_no" ]; then
         	echo "proxy_no: $proxy_no" >> env.yml
 	fi
@@ -342,12 +342,11 @@ fi
 
 OCP_VERSION=`grep ocp_version env.yml | awk '{print $2;}';`
 
-if grep subscription_pool_id env.yml >/dev/null; then 
+if grep subscription_pool_id env.yml >/dev/null; then
 	pool=`grep subscription_pool_id env.yml | awk '{print $2;}';`
         echo '*** attaching host to correct subscription '
         sudo subscription-manager attach --pool=$pool
-        echo '*** disable all repos'
-        sudo subscription-manager repos --disable='*'
+
 elif grep subscription_org_id env.yml >/dev/null; then
 	org_id=`grep subscription_org_id env.yml | awk '{print $2;}';`
 	activation_key=`grep subscription_activationkey env.yml | awk '{print $2;}';`
@@ -358,6 +357,8 @@ fi
 
 
 echo '*** enable repos needed for OCP'
+echo '*** disable all repos'
+sudo subscription-manager repos --disable='*'
 sudo subscription-manager repos --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-ose-$OCP_VERSION-rpms --enable=rhel-7-fast-datapath-rpms
 if [[ $OCP_VERSION != "3.7" ]]; then
        echo '*** enable ansible 2.4 repo for OCP '$OCP_VERSION
