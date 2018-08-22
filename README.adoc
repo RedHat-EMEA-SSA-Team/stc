@@ -28,6 +28,7 @@ of:
 deployed with standard Red Hat Openshift capabilities. By the way, the topology is now dynamic so you can use your prefered number of nodes.
 
 MVS includes following services:
+
  * Container registry
  * Routing layer
  * prometheus
