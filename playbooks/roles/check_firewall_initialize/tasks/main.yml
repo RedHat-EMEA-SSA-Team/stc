@@ -2,6 +2,12 @@
   yum:
     name: nc
     state: present
+- name: Open correct ports from iptables
+  iptables_raw:
+    name: "allow_tcp_{{item}}"
+    rules: "-A INPUT -p tcp -m tcp --dport {{item}} -j ACCEPT"
+  with_items:
+  - "{{firewall_ports}}"
 - name: Start nc -l to all valid ports
   shell: "nc -l {{item}} >/dev/null 2>&1 &"
   async: -1

@@ -185,7 +185,7 @@ openshift_grafana_storage_volume_size=1Gi
 {% if cns is defined %}
 [glusterfs]
 {% for cns_node in cns %}
-{{cns_node}} glusterfs_ip={{ cns_hosts[loop.index0] }} glusterfs_devices='["/dev/vdc"]'
+{{cns_node}} glusterfs_ip={{ cns_hosts[loop.index0] }} glusterfs_devices='["/dev/{{ocs_disk}}"]'
 {% endfor %}
 {% endif %}
 

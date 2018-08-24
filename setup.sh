@@ -207,6 +207,15 @@ if [[ $has_proxy == "y"  ]]; then
 
 fi
 
+while  [ -z $container_disk ]
+do
+  echo "Please insert host device used container storage. (sdb, vcb...). Using lsblk to get information."
+  read -r container_disk
+done
+
+echo "container_disk: $container_disk" >> env.yml
+
+
 while  [ "$cns" != "y" -a "$cns" != "n" ];
 do
 	echo
@@ -215,7 +224,6 @@ do
 	read -r cns
         [[ -z $cns ]] && break
 done
-
 
 if [ "$cns" != "n" ]; then
 
@@ -232,6 +240,15 @@ do
         cns_i=""
 
 done
+
+while  [ -z $ocs_disk ]
+do
+  echo "Please insert host device used for OCS? (sdc, vcd...). Using lsblk to get information."
+  read -r ocs_disk
+done
+
+echo "ocs_disk: $ocs_disk" >> env.yml
+
 
 else
 		echo "Insert NFS Node hostname (leave it blank if not needed, for e.g. pick bastion if needed):"

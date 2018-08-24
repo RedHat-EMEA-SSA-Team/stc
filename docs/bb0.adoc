@@ -38,6 +38,7 @@ on your *Bastion* server as `root`.
 ```
 $ sudo -i
 $ export WORK_DIR=/root/stc
+$ mkdir $WORK_DIR
 $ cd $WORK_DIR
 $ curl -o stc.tgz  -L https://github.com/RedHat-EMEA-SSA-Team/stc/archive/latest.tar.gz
 $ tar -xzvf stc.tgz --strip 1

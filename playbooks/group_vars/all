@@ -26,8 +26,7 @@ packages:
 - sos
 - psacct
 packages_jumphost:
-- "{{ 'openshift-ansible' if '%0.2f'| format(ocp_version|float) == '3.10'  else 'atomic-openshift-utils' }}"
-- atomic-openshift-clients
+- "{{ 'openshift-ansible' if '%0.2f'| format(ocp_version|float) == '3.10'  else 'atomic-openshift-utils atomic-openshift-clients' }}"
 firewall_ports:
 - 4789
 - 8443
@@ -47,7 +46,6 @@ firewall_ports:
 proxy_whitelist:
 - github.com
 - redhat.com
-docker_disk: vdb
 docker_vg: ocp
 docker_version: "{{ '1.12' if ocp_version == '3.7' else '1.13' }}"
 docker_prepull_tag: "v{{ '%0.2f'| format(ocp_version|float)  if '%0.2f'| format(ocp_version|float) == '3.10'  else ocp_version }}"
@@ -55,4 +53,5 @@ docker_prepull:
 - registry.access.redhat.com/openshift3/ose-deployer
 - "registry.access.redhat.com/openshift3/{{ 'ose-node-problem-detector' if '%0.2f'| format(ocp_version|float) == '3.10'  else 'ose-sti-builder' }}"
 - registry.access.redhat.com/openshift3/ose-pod
+- registry.access.redhat.com/openshift3/ose-node
 - registry.access.redhat.com/openshift3/ose-docker-builder

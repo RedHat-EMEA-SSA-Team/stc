@@ -1,15 +1,3 @@
-- setup:
-    filter: ansible_devices
-- name: Figure out device reserved for docker
-  debug:
-    msg:
-      "{{item.value.partitions}}"
-  when: item.value.partitions == {}
-  register: disk_output
-  with_dict: "{{hostvars[inventory_hostname]['ansible_devices']}}"
-- set_fact:
-    docker_disk: "{% for result in disk_output.results if result.item.value.partitions == {} %}{{ result.item.key }}{% endfor %}"
-  when: docker_disk is not defined
 - name: Ensure docker installed
   yum:
     name: docker
