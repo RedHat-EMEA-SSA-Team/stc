@@ -1,6 +1,6 @@
 #!/bin/bash
 
-OCP_VERSION=3.9
+OCP_VERSION=3.10
 CNS_NODES=3
 
 
@@ -29,12 +29,12 @@ if [ ! -f env.yml ]; then
     read req
     [[ $req == "n" ]] && sed -Ei 's/sizing: (.*)/sizing: relaxed/' playbooks/group_vars/all
 
-    echo "Please select OCP Version to install: 3.10, 3.9 or 3.7"
-    echo "3.10 [3.9] 3.7"
+    echo "Please select OCP Version to install: 3.10, 3.9"
+    echo "[3.10] 3.9"
     read ocp_version
 
     case "$ocp_version" in
-        3.10|3.9|3.7) OCP_VERSION=$ocp_version
+        3.10|3.9) OCP_VERSION=$ocp_version
             ;;
     esac
 
@@ -374,10 +374,8 @@ echo '*** enable repos needed for OCP'
 echo '*** disable all repos'
 sudo subscription-manager repos --disable='*'
 sudo subscription-manager repos --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-ose-$OCP_VERSION-rpms --enable=rhel-7-fast-datapath-rpms
-if [[ $OCP_VERSION != "3.7" ]]; then
-    echo '*** enable ansible 2.4 repo for OCP '$OCP_VERSION
-    sudo subscription-manager repos --enable=rhel-7-server-ansible-2.4-rpms
-fi
+echo '*** enable ansible 2.4 repo for OCP '$OCP_VERSION
+sudo subscription-manager repos --enable=rhel-7-server-ansible-2.4-rpms
 
 echo '*** install git and ansible'
 sudo yum install -y git ansible tmux nc screen

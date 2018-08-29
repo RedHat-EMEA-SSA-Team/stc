@@ -8,7 +8,7 @@ node_mem: 16384
 node_vcpus: 2
 sizing: fixed
 bandwidth_limit: 1
-ocp_version: "3.9"
+ocp_version: "3.10"
 repos:
 - rhel-7-server-rpms
 - rhel-7-server-extras-rpms
@@ -47,7 +47,7 @@ proxy_whitelist:
 - github.com
 - redhat.com
 docker_vg: ocp
-docker_version: "{{ '1.12' if ocp_version == '3.7' else '1.13' }}"
+docker_version: "1.13"
 docker_prepull_tag: "v{{ '%0.2f'| format(ocp_version|float)  if '%0.2f'| format(ocp_version|float) == '3.10'  else ocp_version }}"
 docker_prepull:
 - registry.access.redhat.com/openshift3/ose-deployer

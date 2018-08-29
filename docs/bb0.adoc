@@ -130,7 +130,7 @@ y n
 Other Example with standard STC topology (nodes contains router and registry):
 
 ```
-ocp_version: 3.9
+ocp_version: 3.10
 lb: bastion
 nfs: bastion
 bastion: bastion
@@ -151,7 +151,7 @@ rhn_username: username
 Example with smaller topology and infranodes, with version 3.10
 
 ```
-ocp_version: 3.10
+ocp_version: 3.9
 bastion: bastion
 masters:
 - master01
@@ -184,7 +184,7 @@ To do so, please run the following command on your *Bastion* server  as `root` o
 The script will ask you:
 
 * If hardware requirements are met, if not you need to skip hardware requiments check with option: n
-* Which version of OpenShift to prepare for prerequisites and verify, defaults to 3.9
+* Which version of OpenShift to prepare for prerequisites and verify, defaults to 3.10
 * Which type of Subscription management to use in order to register hosts, default is RHSM (need access to Red Hat CDN), and also Satellite giving an Organization ID and an Activation Key
 
 After this it will start registering Bastion host and start the validation across nodes, preparing an inventory file to be used to install OCP later on.
@@ -204,8 +204,8 @@ Defaults value are shown in []
 Are Hardware Requirements satisfied? Min. 16 GB RAM and 2 CPU
 [y] n
 n
-Please select OCP Version to install: 3.10, 3.9 or 3.7
-3.10 [3.9] 3.7
+Please select OCP Version to install: 3.10, 3.9
+[3.10] 3.9
 
 *** selected 3.9
 
@@ -279,7 +279,7 @@ ocp39
 Generated configuration:
 
 ********************* STC Conf file *********************
-ocp_version: 3.9
+ocp_version: 3.10
 api_dns: openshift.example.com
 apps_dns: apps.example.com
 bastion: bastion.example.com
