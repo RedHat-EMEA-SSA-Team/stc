@@ -57,7 +57,7 @@ Please fill in the following information into the script when prompted, default 
 
 
 * Hardware Requirements: If your infrastructure respect hardware requirements
-* OCP Version: Select OpenShift version, default is 3.9
+* OCP Version: Select OpenShift version, default is 3.10
 * Cluster hostname (API DNS):  Hostname under which your Red Hat Openshift cluster
 will be accessible after installation
 Wilcard DNS for Apps: DNS-Record as entered in your DNS Server to catch all future applications
@@ -95,7 +95,7 @@ The content of this YAML will be generated in the stc directory and used by the 
 Generated configuration:
 
 ********************* STC Conf file *********************
-ocp_version: 3.9
+ocp_version: 3.10
 api_dns: openshift.example.com
 apps_dns: apps.example.com
 bastion: bastion.example.com
@@ -148,7 +148,7 @@ api_dns: master.your-ip.nip.io
 rhn_username: username
 ```
 
-Example with smaller topology and infranodes, with version 3.10
+Example with smaller topology and infranodes, with version 3.9
 
 ```
 ocp_version: 3.9
