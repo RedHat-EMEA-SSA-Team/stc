@@ -1,5 +1,5 @@
 == Building Block 0 - Validate and prepare infrastructure
-This *Building Block* is targeted to verify a given environent
+This *Building Block* is targeted to verify a given environment
 before attempting to install Red Hat OpenShift.
 
 While running this *Building Block* the following technical prerequisites will be verified
@@ -19,7 +19,7 @@ following systems
 
 * 1 RHEL Server as *Bastion*
 * 3 RHEL Servers as *Red Hat Openshift Master* incl. Infrastructure Container
-* 3 RHEL Server as *Red Hat Openshift Nodes* incl. Router Container
+* 3 RHEL Servers as *Red Hat Openshift Nodes* incl. Router Container
 
 These systems can be bare metal or virtual server running on any hypervisor.
 
@@ -51,7 +51,7 @@ environment. Based on this file, this *Building Block* will perform a set of
 verification steps.
 
 To make the creation of this configuration YAML file as easy as possible,
-we provided a simple script ad STC Installer for you:
+we provided a simple script at STC Installer for you:
 
 Please fill in the following information into the script when prompted, default value are inside []
 
