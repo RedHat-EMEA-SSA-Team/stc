@@ -6,7 +6,7 @@ This *Building Block* is targeted to build a Red Hat Openshift cluster made out 
 
 === Prerequisites for this Building Block
 To be able to run this *Building Block* you will have to successfully performed
-https://gitlab.consulting.redhat.com/tigers/stc/blob/master/docs/bb0.adoc[Building Block 0]
+https://github.com/RedHat-EMEA-SSA-Team/stc/blob/master/docs/bb0.adoc[Building Block 0]
 
 === Steps to Perform for this Building Block
 Please login to your *bastion* server and run the following commands
@@ -36,7 +36,7 @@ $ cd $WORK_DIR
 $ ansible-playbook /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
 ```
 
-you should have a running Red Hat OpenShift Enterprise cluster.
+you should have a running Red Hat OpenShift Container Platform cluster.
 
 === Post Installation Tasks
 ==== Create Admin-User

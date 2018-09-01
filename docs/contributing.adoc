@@ -41,7 +41,7 @@ Directory structure is like this:
 * Store your building block plays under `playbooks/bbX`
 * Store your playbook vars in `playbooks/vars/bbX.yml` file
 * Create documentation about building block in file `playbooks/docs/bbX.adoc`
-* Use https://gitlab.consulting.redhat.com/tigers/stc/blob/master/docs/bb_template.adoc[BB doc template] as template for your documentation.
+* Use https://github.com/RedHat-EMEA-SSA-Team/stc/blob/master/docs/bb_template.adoc[BB doc template] as template for your documentation.
 * Keep playbook simple. Better to make multiple small ones than one big one.
 
 
