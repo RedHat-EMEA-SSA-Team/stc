@@ -149,7 +149,7 @@ openshift_enable_service_catalog=true
 ansible_service_broker_install=true
 template_service_broker_install=true
 dynamic_volumes_check=false
-openshift_storageclass_name=glusterfs-cns
+openshift_storageclass_name=glusterfs-ocs
 openshift_service_catalog_image_version=latest
 ansible_service_broker_image_prefix=registry.access.redhat.com/openshift3/ose-
 ansible_service_broker_registry_url="registry.access.redhat.com"
@@ -164,7 +164,7 @@ openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
 
 # Grafana
 openshift_grafana_storage_type=pvc
-openshift_grafana_sc_name=glusterfs-cns
+openshift_grafana_sc_name=glusterfs-ocs
 openshift_grafana_storage_volume_size=1Gi
 
 
