@@ -71,16 +71,19 @@ if [ ! -f env.yml ]; then
 
 
 
-    while  [ "$topology" != "standard" -a "$topology" != "mini" -a "$topology" != "full" ]
+    while  [ "$flavor" != "standard" -a "$flavor" != "mini" -a "$flavor" != "full" ]
     do
-        echo "Please select STC topology"
+        echo "Please select STC Flavor"
 	echo "[standard] mini full"
-        read -r topology
-        if [ -z $topology ]; then
-		topology="standard"
+        read -r flavor
+        if [ -z $flavor ]; then
+		flavor="standard"
 	fi
     done
-
+    
+    echo
+    echo "Selected $flavor Flavor"
+    echo
 
     while  [ -z $bastion ]
     do
@@ -91,7 +94,7 @@ if [ ! -f env.yml ]; then
     echo "bastion: $bastion" >> env.yml
     echo "lb: $bastion" >> env.yml
 
-    case "$topology" in
+    case "$flavor" in
         standard)
              n_masters=3
              n_nodes=3
@@ -118,7 +121,7 @@ if [ ! -f env.yml ]; then
             read -r master_i
         done
         echo "- $master_i" >> env.yml
-        [[ "$topology" == "mini" ]] && cns_hosts+=($master_i)
+        [[ "$flavor" == "mini" ]] && cns_hosts+=($master_i)
         master_i=""
 
     done
@@ -156,7 +159,7 @@ if [ ! -f env.yml ]; then
             read -r node_i
         done
         echo "- $node_i" >> env.yml
-        [[ "$topology" != "full" ]] && cns_hosts+=($node_i)
+        [[ "$flavor" != "full" ]] && cns_hosts+=($node_i)
         node_i=""
 
     done
