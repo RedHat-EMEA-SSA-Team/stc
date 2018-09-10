@@ -25,7 +25,7 @@ of:
  * 3 Master
  * 3 Nodes
 
-deployed with standard Red Hat Openshift capabilities. By the way, the topology is now dynamic so you can use your prefered number of nodes.
+deployed with standard Red Hat Openshift capabilities. The topology is now dynamic in terms of 3 possible STC *Flavor* to be used for the setup (standard, mini and full)
 
 MVS includes following services:
 
