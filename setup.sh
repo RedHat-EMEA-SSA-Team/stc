@@ -283,20 +283,24 @@ if [ ! -f env.yml ]; then
         #sudo subscription-manager repos --disable='*'
     else
         echo '*** registering host to Satellite'
-        echo "Please insert Organization ID:"
-        read org_id
+        while  [ -z $org_id ]
+        do
+            echo "Please insert Organization ID:"
+            read -r org_id
+        done
+        
         echo
-        echo "Please insert Activation Key:"
-        read ak
+
+        while  [ -z $ak ]
+        do
+            echo "Please insert Activation Key:"
+            read -r ak
+        done
+
         echo
-        if [ -z "$org_id" -o -z "$ak" ]; then
-            echo "Error: Organization ID and Activation Key cannot be empty"
-            exit 1
-        fi
+
         echo "subscription_activationkey: $ak" >> env.yml
         echo "subscription_org_id: $org_id" >> env.yml
-        #echo "*** using Organization ID $org_id and Activation Key $ask to register host"
-        #sudo subscription-manager register --org="$org_id" --activationkey="$ak"
     fi
 
     echo
