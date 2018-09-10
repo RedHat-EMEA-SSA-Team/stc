@@ -26,19 +26,19 @@ These systems can be bare metal or virtual server running on any hypervisor.
 Topology can be modified in terms of Flavors:
 
 * *Standard*: default flavor, 7 nodes
-* * 1 Bastion
-* * 3 Masters
-* * 3 Nodes: contains OCS
+** 1 Bastion
+** 3 Masters
+** 3 Nodes: contains OCS
 * *Mini*: 4 nodes
-* * 1 Bastion
-* * 1 Master: OCS node 1
-* * 1 Infranode: OCS node 2
-* * 1 Node: OCS node 3
+** 1 Bastion
+** 1 Master: OCS node 1
+** 1 Infranode: OCS node 2
+** 1 Node: OCS node 3
 * *Full*: 10 nodes
-* * 1 Bastion
-* * 3 Masters
-* * 3 Infranodes: contains OCS
-* * 3 Nodes
+** 1 Bastion
+** 3 Masters
+** 3 Infranodes: contains OCS
+** 3 Nodes
 
 
 NOTE: Please be aware that currently Red Hat Openshift expects a minimum of
