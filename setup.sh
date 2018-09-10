@@ -70,6 +70,18 @@ if [ ! -f env.yml ]; then
     echo
 
 
+
+    while  [ "$topology" != "standard" -a "$topology" != "mini" -a "$topology" != "full" ]
+    do
+        echo "Please select STC topology"
+	echo "[standard] mini full"
+        read -r topology
+        if [ -z $topology ]; then
+		topology="standard"
+	fi
+    done
+
+
     while  [ -z $bastion ]
     do
         echo "Please insert Bastion Node hostname:"
@@ -77,25 +89,26 @@ if [ ! -f env.yml ]; then
     done
 
     echo "bastion: $bastion" >> env.yml
+    echo "lb: $bastion" >> env.yml
 
-    echo "Please insert a Load Balancer Node hostname (leave it blank if not needed or external Balancer is present, for e.g. pick bastion if needed):"
-    read -r lb
-
-    [[ -n $lb  ]] && echo "lb: $lb" >> env.yml
-
-    while  [ "$n_masters" != "1" -a  "$n_masters" != "3" ]
-    do
-        echo "Please insert number of Masters (1 or 3):"
-        echo "1 [3]"
-        read -r n_masters
-        if [ -z $n_masters ]; then
-            n_masters=3
-            break
-        fi
-    done
+    case "$topology" in
+        standard)
+             n_masters=3
+             n_nodes=3
+             ;;
+        mini) 
+             n_masters=1
+             n_infranodes=1
+             n_nodes=1
+             ;;
+        full)
+             n_masters=3
+             n_infranodes=3
+             n_nodes=3
+             ;;    
+    esac
 
     echo "masters:" >> env.yml
-
 
     for (( c=1; c<=$n_masters; c++ ))
     do
@@ -105,6 +118,7 @@ if [ ! -f env.yml ]; then
             read -r master_i
         done
         echo "- $master_i" >> env.yml
+        [[ "$topology" == "mini" ]] && cns_hosts+=($master_i)
         master_i=""
 
     done
@@ -112,9 +126,6 @@ if [ ! -f env.yml ]; then
 
 
 
-    echo "Please insert number of Infranodes (0 or 3, leave blank if Master nodes are also Infranodes):"
-
-    read -r n_infranodes
 
     if [ -n "$n_infranodes" ]; then
         echo "infranodes:" >> env.yml
@@ -127,24 +138,12 @@ if [ ! -f env.yml ]; then
                 read -r infranode_i
             done
             echo "- $infranode_i" >> env.yml
+            cns_hosts+=($infranode_i)
             infranode_i=""
-
         done
 
     fi
 
-
-
-    while  [ "$n_nodes" != "1" -a "$n_nodes" != "2" -a "$n_nodes" != "3" ]
-    do
-        echo "Please insert number of Nodes (1, 2 or 3):"
-        echo "1 2 [3]"
-        read -r n_nodes
-        if [ -z $n_nodes ]; then
-            n_nodes=3
-            break
-        fi
-    done
 
     echo "nodes:" >> env.yml
 
@@ -157,8 +156,16 @@ if [ ! -f env.yml ]; then
             read -r node_i
         done
         echo "- $node_i" >> env.yml
+        [[ "$topology" != "full" ]] && cns_hosts+=($node_i)
         node_i=""
 
+    done
+
+    echo "cns:" >> env.yml
+
+    for (( c=0; c<$CNS_NODES; c++ ))
+    do
+        echo "- ${cns_hosts[$c]}" >> env.yml
     done
 
 
@@ -216,47 +223,14 @@ if [ ! -f env.yml ]; then
     echo "container_disk: $container_disk" >> env.yml
 
 
-    while  [ "$cns" != "y" -a "$cns" != "n" ];
+
+    while  [ -z $ocs_disk ]
     do
-        echo
-        echo "Install OCS (formerly known as CNS)?"
-        echo "[y] n"
-        read -r cns
-        [[ -z $cns ]] && break
+          echo "Please insert host device used for OCS? (sdc, vdc...). Using lsblk to get information."
+          read -r ocs_disk
     done
 
-    if [ "$cns" != "n" ]; then
-
-        echo "cns:" >> env.yml
-
-        for (( c=1; c<=$CNS_NODES; c++ ))
-        do
-            while  [ -z $cns_i ]
-            do
-                echo "Please insert OCS Node $c hostname (e.g. pick masters, infra or nodes):"
-                read -r cns_i
-            done
-            echo "- $cns_i" >> env.yml
-            cns_i=""
-
-        done
-
-        while  [ -z $ocs_disk ]
-        do
-            echo "Please insert host device used for OCS? (sdc, vdc...). Using lsblk to get information."
-            read -r ocs_disk
-        done
-
-        echo "ocs_disk: $ocs_disk" >> env.yml
-
-
-    else
-        echo "Insert NFS Node hostname (leave it blank if not needed, for e.g. pick bastion if needed):"
-        read -r nfs
-        [[ -n $nfs ]] && echo "nfs: $nfs" >> env.yml
-
-    fi
-
+    echo "ocs_disk: $ocs_disk" >> env.yml
 
     while  [ -z $ssh_user ]
     do
