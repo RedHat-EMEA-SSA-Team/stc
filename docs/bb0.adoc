@@ -91,8 +91,8 @@ for outside connectivity.
 * No proxy: Select host to skip for proxing
 * Proxy username: Username in case you need to authenticate with the Proxies
 defined in the previous fields.
-* Remote SSH user: Remote user which is used to access all hosts used
-for Openshift. Must have sudo access on hosts. Defaults to root.
+* Proxy password: Password in case you need to authenticate with the Proxies
+defined in the previous fields.
 * Red Hat account username: your accountname on the Red Hat website.
 * Remote SSH user: Remote user which is used to access all hosts used
 for Openshift. Must have sudo access on hosts. Defaults to root.
