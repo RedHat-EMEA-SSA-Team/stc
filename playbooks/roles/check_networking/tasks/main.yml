@@ -1,0 +1,15 @@
+- name: check is net.ipv4.ip_forward turned on
+  command: sysctl -b net.ipv4.ip_forward
+  register: ip_forward_check
+- name: show error
+  debug:
+    msg: "net.ipv4.ip_forward is 0 forcing it to 1"
+  when: ip_forward_check.stdout == 0
+- name: force net.ipv4.ip_forward to 1
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+    sysctl_set: yes
+    state: present
+    reload: yes
+  when: ip_forward_check.stdout == 0

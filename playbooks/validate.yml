@@ -36,6 +36,7 @@
   vars_files:
   - "{{file_env}}"
   roles:
+  - check_networking
   - check_packages_nodes
 
 
