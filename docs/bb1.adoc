@@ -1,8 +1,4 @@
 == Building Block 1 - Install Minimal Viable Product
-This *Building Block* is targeted to build a Red Hat Openshift cluster made out of
-
- * 3 Master
- * 3 Nodes
 
 === Prerequisites for this Building Block
 To be able to run this *Building Block* you will have to successfully performed
