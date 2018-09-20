@@ -125,24 +125,11 @@ openshift_logging_es_pvc_size=10Gi
 openshift_logging_es_pvc_dynamic=true
 openshift_logging_es_pvc_storage_class_name=glusterfs-ocs-block
 openshift_logging_es_memory_limit=8Gi
+
 # Prometheus
-openshift_hosted_prometheus_deploy=true
-openshift_prometheus_namespace=openshift-metrics
-openshift_prometheus_storage_kind=dynamic
-openshift_prometheus_storage_volume_name=prometheus
-openshift_prometheus_storage_volume_size=10Gi
-openshift_prometheus_storage_type='pvc'
-openshift_prometheus_storage_class=glusterfs-ocs-block
-openshift_prometheus_alertmanager_storage_kind=dynamic
-openshift_prometheus_alertmanager_storage_volume_name=prometheus-alertmanager
-openshift_prometheus_alertmanager_storage_volume_size=5Gi
-openshift_prometheus_alertmanager_storage_type='pvc'
-openshift_prometheus_alertmanager_storage_class=glusterfs-ocs-block
-openshift_prometheus_alertbuffer_storage_kind=dynamic
-openshift_prometheus_alertbuffer_storage_volume_name=prometheus-alertbuffer
-openshift_prometheus_alertbuffer_storage_volume_size=5Gi
-openshift_prometheus_alertbuffer_storage_type='pvc'
-openshift_prometheus_alertbuffer_storage_class=glusterfs-ocs-block
+openshift_cluster_monitoring_operator_install=true
+openshift_cluster_monitoring_operator_prometheus_storage_capacity=5Gi
+openshift_cluster_monitoring_operator_node_selector={"node-role.kubernetes.io/infra":"true"}
 
 # Service brokers
 openshift_enable_service_catalog=true
@@ -161,11 +148,11 @@ openshift_hosted_etcd_storage_access_modes=["ReadWriteOnce"]
 openshift_hosted_etcd_storage_volume_size=1Gi
 openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
 
-
 # Grafana
 openshift_grafana_storage_type=pvc
 openshift_grafana_sc_name=glusterfs-ocs
 openshift_grafana_storage_volume_size=1Gi
+openshift_grafana_node_selector={"node-role.kubernetes.io/infra":"true"}
 
 
 [masters]
