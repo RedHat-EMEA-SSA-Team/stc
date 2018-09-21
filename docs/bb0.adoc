@@ -6,7 +6,7 @@ While running this *Building Block* the following technical prerequisites will b
 
 * each system having at least 2 CPU-Cores ( physical or virtual )
 * each system having at least 16GB RAM
-* each system having at least 10GB of Disk Storage under /
+* each system having at least 20GB of Disk Storage under /
 * each system having at least 40GB of Disk Storage under /var
 * each system having at least 15GB of Disk Storage under empty device for container storage (e.g. /dev/vdb)
 * if used, each system that need to host OCS having at least 100GB of raw disk (e.g. /dev/vdc)
