@@ -38,6 +38,7 @@
   roles:
   - check_packages_nodes
 
+
 - name: Validate environment
   gather_facts: no
   hosts: all
@@ -45,6 +46,8 @@
   - "{{file_env}}"
   - "{{file_secrets}}"
   tasks:
+    - import_role:
+        name: check_disks
     - import_role:
         name: check_subscription
     - import_role:
