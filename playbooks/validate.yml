@@ -86,7 +86,7 @@
 
 - name: Validate docker
   hosts: nodes
-  gather_facts: ys
+  gather_facts: yes
   vars_files:
   - "{{file_env}}"
   roles:
