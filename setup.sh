@@ -24,11 +24,6 @@ if [ ! -f env.yml ]; then
     echo
 
 
-    echo "Are Hardware Requirements satisfied? Min. 16 GB RAM and 2 CPU"
-    echo "[y] n"
-    read req
-    [[ $req == "n" ]] && sed -Ei 's/sizing: (.*)/sizing: relaxed/' playbooks/group_vars/all
-
     echo "Please select OCP Version to install: 3.10, 3.9"
     echo "[3.10] 3.9"
     read ocp_version
