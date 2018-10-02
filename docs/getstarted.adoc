@@ -3,7 +3,7 @@
 To get started you will need two main things
 
 [square]
-* At least 7 VMs / hosts
+* At least 4 VMs / hosts 
 * RedHat Openshift Container Platform subscription
 
 === Hardware requirements
@@ -11,7 +11,7 @@ To get started you will need two main things
 These are minimal hardware requirements
 
 [square]
-* 2 vCPU
+* 4 vCPU
 * 16 GB memory
 * storage
 ** device 1 (for OS)
@@ -40,4 +40,4 @@ All hosts should be identical
 
 === Other useful info
 * Information about proxy; address, username, password, whitelists etc.
-* RedHat Network (RHN) account info for registering and subscribing hosts (activation key works also)
+* Red Hat Subscription Management (RHSM) account info or Satellite activation keys for registering and subscribing hosts 
