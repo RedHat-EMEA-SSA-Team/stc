@@ -4,7 +4,7 @@ before attempting to install Red Hat OpenShift.
 
 While running this *Building Block* the following technical prerequisites will be verified
 
-* each system having at least 2 CPU-Cores ( physical or virtual )
+* each system having at least 4 CPU-Cores ( physical or virtual )
 * each system having at least 16GB RAM
 * each system having at least 20GB of Disk Storage under /
 * each system having at least 40GB of Disk Storage under /var

@@ -5,7 +5,7 @@ file_ip_data: ../ip
 sku_name: Employee SKU
 disk_free_space: 20
 node_mem: 16384
-node_vcpus: 2
+node_vcpus: 4
 sizing: fixed
 bandwidth_limit: 1
 ocp_version: "3.10"
