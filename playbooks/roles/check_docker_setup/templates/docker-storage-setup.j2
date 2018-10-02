@@ -1,6 +1,6 @@
 WIPE_SIGNATURES=true
 STORAGE_DRIVER=overlay2
-{%if docker_disk is defined%}
+{%if container_disk is defined%}
 DEVS=/dev/{{container_disk}}
 {%endif%}
 CONTAINER_ROOT_LV_NAME=dockerlv
