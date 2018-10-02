@@ -11,7 +11,7 @@ While running this *Building Block* the following technical prerequisites will b
 * each system having at least 15GB of Disk Storage under empty device for container storage (e.g. /dev/vdb)
 * if used, each system that need to host OCS having at least 100GB of raw disk (e.g. /dev/vdc)
 
-Hardware requirements are based on official https://docs.openshift.com/container-platform/latest/install/prerequisites.html#hardware[OCP documentation, window="_blank"]
+Hardware requirements are based on official https://docs.openshift.com/container-platform/latest/install/prerequisites.html#hardware[OCP documentation]
 
 === Prerequisites for this Building Block
 To be able to run this *Building Block* we recommend to prepare the
