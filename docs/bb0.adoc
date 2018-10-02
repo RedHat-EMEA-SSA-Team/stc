@@ -11,11 +11,11 @@ While running this *Building Block* the following technical prerequisites will b
 * each system having at least 15GB of Disk Storage under empty device for container storage (e.g. /dev/vdb)
 * if used, each system that need to host OCS having at least 100GB of raw disk (e.g. /dev/vdc)
 
-Hardware requirements are based on official https://docs.openshift.com/container-platform/latest/install_config/install/prerequisites.html#production-level-hardware-requirements[OCP documentation]
+Hardware requirements are based on official https://docs.openshift.com/container-platform/latest/install/prerequisites.html#hardware[OCP documentation, window="_blank"]
 
 === Prerequisites for this Building Block
 To be able to run this *Building Block* we recommend to prepare the
-following systems for the default *Flavor*:
+following systems for the default *Flavor* (Standard):
 
 * 1 RHEL Server as *Bastion* incl. HAProxy Load Balancer
 * 3 RHEL Servers as *Red Hat Openshift Master* incl. Infrastructure Containers
@@ -42,7 +42,7 @@ Topology can be modified in terms of Flavors:
 
 
 NOTE: Please be aware that currently Red Hat Openshift expects a minimum of
-2 CPU Cores and 16GB of RAM per node.
+4 CPU Cores and 16GB of RAM per node.
 
 === Steps to Perform for this Building Block
 
@@ -75,29 +75,27 @@ Please fill in the following information into the script when prompted, default 
 will be accessible after installation
 Wilcard DNS for Apps: DNS-Record as entered in your DNS Server to catch all future applications
 running on Red Hat Openshift
-* Cluster Topology: Select STC flavor, standard (default), mini or full
-* Bastion hostname: The hostname of jumphost to run validation and installation
-* Masters: 1 or 3, depends on flavor
-* Infranodes: 1 or 3, available only for mini or full flavor
-* Compute Nodes: 1 or 3, depends on flvor
-* Proxy support: Enable proxy access for OpenShift services, Docker, Git and environments configuration
-* Internet proxy HTTP: Hostname and Port of your HTTP
+* *Cluster Topology*: Select STC flavor, standard (default), mini or full
+* *Bastion hostname*: The hostname of jumphost to run validation and installation
+* *Master hostname*: 1 or 3, depends on flavor
+* *Infranode hostname*: 1 or 3, available only for mini or full flavor
+* *Nodes hostname*: 1 or 3, depends on flavor
+* *Proxy support*: Enable proxy access for OpenShift services, Docker, Git and environments configuration
+* *Internet proxy HTTP*: Hostname and Port of your HTTP
 for outside connectivity.
-* Internet proxy HTTPS: Hostname and Port of your HTTP Proxy, if one is needed
+* *Internet proxy HTTPS*: Hostname and Port of your HTTP Proxy, if one is needed
 for outside connectivity.
-* No proxy: Select host to skip for proxing
-* Proxy username: Username in case you need to authenticate with the Proxies
+* *No proxy*: Select host to skip for proxing
+* *Proxy username*: Username in case you need to authenticate with the Proxies
 defined in the previous fields.
-* Proxy password: Password in case you need to authenticate with the Proxies
+* *Proxy password*: Password in case you need to authenticate with the Proxies
 defined in the previous fields.
-* Red Hat account username: your accountname on the Red Hat website.
-* Remote SSH user: Remote user which is used to access all hosts used
+* *Remote SSH user*: Remote user which is used to access all hosts used
 for Openshift. Must have sudo access on hosts. Defaults to root.
-* How do you manage your subscription and repositories: Select RHSM for direct access to Red Hat CDN for
+* *How do you manage your subscription and repositories*: Select RHSM for direct access to Red Hat CDN for
 Subscription Management or select Satellite if present
-* RHSM Username: Select your RHSM Username, password will be asked and stored in Ansible Vault later
-* Satellite Org ID and Activation Key: Provide an Org ID and an Acivation Key which containers OpenShift required repositories through
-a properly configured Content View
+* *RHSM Username*: Select your RHSM Username, password will be asked and stored in Ansible Vault later
+* *Satellite Org ID and Activation Key*: Provide an Org ID and an Acivation Key which containers OpenShift required repositories through a properly configured Content View
 
 The content of this YAML will be generated in the stc directory and used by the installer, if you agreed to proceed with `y` option, the validation will start:
 
@@ -142,7 +140,6 @@ Other Example with standard STC topology (nodes contains router and registry):
 ```
 ocp_version: 3.10
 lb: bastion
-nfs: bastion
 bastion: bastion
 masters:
 - master01
@@ -193,7 +190,6 @@ To do so, please run the following command on your *Bastion* server  as `root` o
 
 The script will ask you:
 
-* If hardware requirements are met, if not you need to skip hardware requiments check with option: n
 * Which version of OpenShift to prepare for prerequisites and verify, defaults to 3.10
 * Which type of Subscription management to use in order to register hosts, default is RHSM (need access to Red Hat CDN), and also Satellite giving an Organization ID and an Activation Key
 
@@ -211,9 +207,6 @@ After this it will start registering Bastion host and start the validation acros
 Welcome to STC OpenShift Installation Validator
 Defaults value are shown in []
 
-Are Hardware Requirements satisfied? Min. 16 GB RAM and 2 CPU
-[y] n
-n
 Please select OCP Version to install: 3.10, 3.9
 [3.10] 3.9
 
