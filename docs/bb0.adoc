@@ -49,16 +49,13 @@ NOTE: Please be aware that currently Red Hat Openshift expects a minimum of
 ==== Download Scripts and Playbooks
 With the YAML Configuration file ready, you will now have to download the
 scripts and Ansible Playbooks. To do so, please run the following commands
-on your *Bastion* server as `root`:
+on your *Bastion* server as privileged user:
 
 ```
 $ sudo -i
-$ export WORK_DIR=/root/stc
-$ mkdir $WORK_DIR
-$ cd $WORK_DIR
-$ curl -o stc.tgz  -L https://github.com/RedHat-EMEA-SSA-Team/stc/archive/latest.tar.gz
-$ tar -xzvf stc.tgz --strip 1
-$ chmod +x setup.sh
+# curl -o stc.tgz  -L https://github.com/RedHat-EMEA-SSA-Team/stc/archive/latest.tar.gz
+# tar xvf stc.tgz --strip 1
+# chmod +x setup.sh
 ```
 
 ==== Prepare Configuration File
