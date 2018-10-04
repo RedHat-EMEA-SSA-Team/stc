@@ -188,8 +188,8 @@ if [ ! -f env.yml ]; then
         done
 
         echo "proxy_https: $proxy_https" >> env.yml
-
-        echo "Please insert No Proxy (leave blank if any)"
+        
+        echo "Please insert No Proxy (leave blank if any, automatically adding localhost,127.0.0.1,.svc"
         read -r proxy_no
 
         if [ -n "$proxy_no" ]; then

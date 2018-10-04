@@ -16,6 +16,12 @@
   - "{{ proxy_uc_envs }}"
   - "{{ proxies }}"
   when: proxy_username is not defined and proxy_http is defined
+- name: ensure no proxy settings uppercase
+  lineinfile:
+    dest: /etc/environment
+    state: present
+    line: "NO_PROXY=127.0.0.1,localhost,.svc,{{proxy_no | default('')}}"
+  when: proxy_http is defined
 - name: ensure proxy settings lowercase with username and password
   lineinfile:
     dest: /etc/environment
@@ -34,6 +40,12 @@
   - "{{ proxy_lc_envs }}"
   - "{{ proxies }}"
   when: proxy_username is not defined and proxy_http is defined
+- name: ensure no proxy settings lowercase
+  lineinfile:
+    dest: /etc/environment
+    state: present
+    line: "no_proxy=127.0.0.1,localhost,.svc,{{proxy_no | default('')}}"
+  when: proxy_http is defined
 
 
 

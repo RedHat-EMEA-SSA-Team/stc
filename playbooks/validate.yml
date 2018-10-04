@@ -6,15 +6,12 @@
     proxy_uc_envs:
     - HTTP_PROXY
     - HTTPS_PROXY
-    - NO_PROXY
     proxy_lc_envs:
     - http_proxy
     - https_proxy
-    - no_proxy
     proxies:
     - "{{ proxy_http }}"
     - "{{ proxy_https }}"
-    - "{{ proxy_no }}"
   vars_files:
   - "{{file_env}}"
   - "{{file_secrets}}"
