@@ -85,7 +85,7 @@ running on Red Hat Openshift
 for outside connectivity.
 * *Internet proxy HTTPS*: Hostname and Port of your HTTP Proxy, if one is needed
 for outside connectivity.
-* *No proxy*: Select host to skip for proxing
+* *No proxy*: Select host to skip for proxing (you can skip localhost and .svc as they will be automatically added)
 * *Proxy username*: Username in case you need to authenticate with the Proxies
 defined in the previous fields.
 * *Proxy password*: Password in case you need to authenticate with the Proxies
@@ -118,7 +118,7 @@ nodes:
 - node03.example.com
 proxy_http: http://proxy.example.com:3128
 proxy_https: http://proxy.example.com:3128
-proxy_no: proxy.example.com,127.0.0.1,localhost
+proxy_no: proxy.example.com
 cns:
 - master01.example.com
 - master02.example.com
@@ -169,7 +169,7 @@ nodes:
 ssh_user: cloud-user
 proxy_http: 'http://proxy.company.local:3128'
 proxy_https: 'http://proxy.company.local:3128'
-proxy_no: 'satellite.company.local,localhost,127.0.0.1'
+proxy_no: 'satellite.company.local'
 apps_dns: apps.company.local
 api_dns: master01.company.local
 rhn_username: username
@@ -249,8 +249,8 @@ Please insert HTTP Proxy:
 http://proxy.example.com:3128
 Please insert HTTPS Proxy:
 http://proxy.example.com:3128
-Please insert No Proxy (leave blank if any)
-proxy.example.com,127.0.0.1,localhost
+Please insert No Proxy (leave blank if any, automatically adding localhost,127.0.0.1,.svc)
+proxy.example.com
 Please insert Proxy Username (leave blank if any)
 
 Please insert Proxy Password (leave blank if any)
@@ -287,7 +287,7 @@ nodes:
 - node03.example.com
 proxy_http: http://proxy.example.com:3128
 proxy_https: http://proxy.example.com:3128
-proxy_no: proxy.example.com,127.0.0.1,localhost
+proxy_no: proxy.example.com
 cns:
 - node01.example.com
 - node02.example.com
