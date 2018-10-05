@@ -36,6 +36,7 @@ MVS includes following services:
  * Hawkular based metrics
  * EFK stack log aggregation for apps
  * Openshift Containers Storage (OCS)
+ * Grafana
 
 
 For a complete list of technical pre-requisites, please check https://github.com/RedHat-EMEA-SSA-Team/stc/blob/master/docs/getstarted.adoc[this document].
