@@ -132,21 +132,10 @@ openshift_cluster_monitoring_operator_prometheus_storage_capacity=5Gi
 openshift_cluster_monitoring_operator_node_selector={"node-role.kubernetes.io/infra":"true"}
 
 # Service brokers
-openshift_enable_service_catalog=true
-ansible_service_broker_install=true
-template_service_broker_install=true
-dynamic_volumes_check=false
-openshift_storageclass_name=glusterfs-ocs
-openshift_service_catalog_image_version=latest
-ansible_service_broker_image_prefix=registry.access.redhat.com/openshift3/ose-
-ansible_service_broker_registry_url="registry.access.redhat.com"
-openshift_service_catalog_image_prefix=registry.access.redhat.com/openshift3/ose-
-openshift_template_service_broker_namespaces=['openshift']
-openshift_hosted_etcd_storage_kind=dynamic
-openshift_hosted_etcd_storage_volume_name=etcd-vol
-openshift_hosted_etcd_storage_access_modes=["ReadWriteOnce"]
-openshift_hosted_etcd_storage_volume_size=1Gi
-openshift_hosted_etcd_storage_labels={'storage': 'etcd'}
+
+#openshift_service_catalog_image_version=latest
+#ansible_service_broker_local_registry_whitelist=['.*-apb$']
+#openshift_template_service_broker_namespaces=['openshift']
 
 # Grafana
 openshift_grafana_storage_type=pvc
