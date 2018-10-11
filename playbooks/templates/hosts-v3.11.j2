@@ -110,7 +110,7 @@ openshift_storage_glusterfs_block_host_vol_size=50
 openshift_storage_glusterfs_block_storageclass=true
 
 # Metrics deployment
-openshift_metrics_install_metrics=true
+openshift_metrics_install_metrics=false
 openshift_metrics_hawkular_hostname=metrics.{{ apps_dns | replace("*.","")}}
 openshift_metrics_cassandra_replicas=1
 openshift_metrics_cassandra_limits_memory=2Gi
@@ -133,6 +133,8 @@ openshift_logging_es_memory_limit=8Gi
 
 # Prometheus
 openshift_cluster_monitoring_operator_install=true
+openshift_cluster_monitoring_operator_prometheus_storage_enabled=true
+openshift_cluster_monitoring_operator_alertmanager_storage_enabled=true
 openshift_cluster_monitoring_operator_prometheus_storage_capacity=5Gi
 openshift_cluster_monitoring_operator_node_selector={"node-role.kubernetes.io/infra":"true"}
 
