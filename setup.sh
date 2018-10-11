@@ -2,7 +2,7 @@
 
 OCP_VERSION=3.10
 CNS_NODES=3
-
+ANSIBLE_VERSION=2.4
 
 cat << EOF
  ____ _____ ____
@@ -24,12 +24,12 @@ if [ ! -f env.yml ]; then
     echo
 
 
-    echo "Please select OCP Version to install: 3.10, 3.9"
-    echo "[3.10] 3.9"
+    echo "Please select OCP Version to install: 3.11, 3.10"
+    echo "3.11 [3.10]"
     read ocp_version
 
     case "$ocp_version" in
-        3.10|3.9) OCP_VERSION=$ocp_version
+        3.11|3.10) OCP_VERSION=$ocp_version
             ;;
     esac
 
@@ -272,10 +272,6 @@ if [ ! -f env.yml ]; then
             SUBSCRIPTION_POOL_ID=$pool_id
             echo 'subscription_pool_id: '$SUBSCRIPTION_POOL_ID >> env.yml
         fi
-        #echo '*** attaching host to correct subscription '
-        #sudo subscription-manager attach --pool=$SUBSCRIPTION_POOL_ID
-        #echo '*** disable all repos'
-        #sudo subscription-manager repos --disable='*'
     else
         echo '*** registering host to Satellite'
         while  [ -z $org_id ]
@@ -350,8 +346,12 @@ echo '*** enable repos needed for OCP'
 echo '*** disable all repos'
 sudo subscription-manager repos --disable='*'
 sudo subscription-manager repos --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-ose-$OCP_VERSION-rpms --enable=rhel-7-fast-datapath-rpms
-echo '*** enable ansible 2.4 repo for OCP '$OCP_VERSION
-sudo subscription-manager repos --enable=rhel-7-server-ansible-2.4-rpms
+
+if [ "$OCP_VERSION" == "3.11" ]; then
+	ANSIBLE_VERSIN="2.6"
+fi
+echo '*** enable ansible '$ANSIBLE_VERSION' repo for OCP '$OCP_VERSION
+sudo subscription-manager repos --enable=rhel-7-server-ansible-$ANSIBLE_VERSION-rpms
 
 echo '*** install git and ansible'
 sudo yum install -y git ansible tmux nc screen
