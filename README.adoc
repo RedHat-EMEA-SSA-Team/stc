@@ -38,6 +38,14 @@ MVS includes following services:
  * Openshift Containers Storage (OCS)
  * Grafana
 
+=== Supported OCP Versions
+
+[cols="1,1",options="header"]
+|=======
+|Version |Description
+|3.11 | Latest OCP release
+|3.10 | Current STC default
+|=======
 
 For a complete list of technical pre-requisites, please check https://github.com/RedHat-EMEA-SSA-Team/stc/blob/master/docs/getstarted.adoc[this document].
 
