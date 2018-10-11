@@ -18,6 +18,11 @@ ansible_become={% if ssh_user == "root" %}no{% else %}yes{% endif %}
 
 # https://github.com/openshift/openshift-ansible/blob/master/DEPLOYMENT_TYPES.md
 deployment_type=openshift-enterprise
+oreg_url=registry.redhat.io/openshift3/ose-${component}:${version}
+{% if rhn_username is defined and rhn_password is defined %}
+oreg_auth_user={{rhn_username}}
+oreg_auth_password={{rhn_password}}
+{% endif %}
 containerized=false
 
 # Skip env validation
