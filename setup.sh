@@ -348,7 +348,7 @@ sudo subscription-manager repos --disable='*'
 sudo subscription-manager repos --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-ose-$OCP_VERSION-rpms --enable=rhel-7-fast-datapath-rpms
 
 if [ "$OCP_VERSION" == "3.11" ]; then
-	ANSIBLE_VERSIN="2.6"
+	ANSIBLE_VERSION="2.6"
 fi
 echo '*** enable ansible '$ANSIBLE_VERSION' repo for OCP '$OCP_VERSION
 sudo subscription-manager repos --enable=rhel-7-server-ansible-$ANSIBLE_VERSION-rpms
