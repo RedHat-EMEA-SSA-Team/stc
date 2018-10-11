@@ -12,7 +12,7 @@ ocp_version: "3.10"
 repos:
 - rhel-7-server-rpms
 - rhel-7-server-extras-rpms
-- "rhel-7-server-ose-{{ '%0.2f'| format(ocp_version|float)  if '%0.2f'| format(ocp_version|float) == '3.10'  else ocp_version }}-rpms"
+- "rhel-7-server-ose-{{ '%0.2f'| format(ocp_version|float) }}-rpms"
 - rhel-7-fast-datapath-rpms
 packages:
 - wget
@@ -26,7 +26,7 @@ packages:
 - sos
 - psacct
 packages_jumphost:
-- "{{ 'openshift-ansible' if '%0.2f'| format(ocp_version|float) == '3.10'  else 'atomic-openshift-utils atomic-openshift-clients' }}"
+- openshift-ansible
 firewall_ports:
 - 4789
 - 8443
@@ -48,10 +48,10 @@ proxy_whitelist:
 - redhat.com
 docker_vg: ocp
 docker_version: "1.13"
-docker_prepull_tag: "v{{ '%0.2f'| format(ocp_version|float)  if '%0.2f'| format(ocp_version|float) == '3.10'  else ocp_version }}"
+docker_prepull_tag: "v{{ '%0.2f'| format(ocp_version|float) }}"
 docker_prepull:
 - registry.access.redhat.com/openshift3/ose-deployer
-- "registry.access.redhat.com/openshift3/{{ 'ose-node-problem-detector' if '%0.2f'| format(ocp_version|float) == '3.10'  else 'ose-sti-builder' }}"
+- registry.access.redhat.com/openshift3/ose-node-problem-detector
 - registry.access.redhat.com/openshift3/ose-pod
 - registry.access.redhat.com/openshift3/ose-node
 - registry.access.redhat.com/openshift3/ose-docker-builder
