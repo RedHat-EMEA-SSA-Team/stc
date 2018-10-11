@@ -25,10 +25,11 @@ ose_images="
   openshift3/logging-elasticsearch
   openshift3/logging-fluentd
   openshift3/logging-kibana
-
+{% if '%0.2f'| format(ocp_version|float) == '3.10' %}
   openshift3/metrics-cassandra
   openshift3/metrics-hawkular-metrics
   openshift3/metrics-heapster
+{% endif %}
 
   openshift3/prometheus
   openshift3/prometheus-alert-buffer

@@ -1,0 +1,25 @@
+- name: Setup squid proxy
+  hosts: bastion
+  gather_facts: no
+  vars_files:
+  - ../vars/bb4.yml
+  - ../group_vars/all
+  tasks:
+  - name: Install required packages
+    yum:
+      name: "{{item}}"
+      state: present
+    with_items: "{{proxy_packages}}"
+  - name: Create squid conf
+    template:
+      src: templates/squid.j2
+      dest: /etc/squid/squid.conf
+      mode: 0755
+    notify: Restart squid
+  handlers:
+    - name: Restart squid
+      service:
+        name: squid
+        state: restarted
+
+
