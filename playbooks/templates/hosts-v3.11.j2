@@ -6,7 +6,9 @@ etcd
 {% if lb is defined %}
 lb
 {% endif %}
+{% if bastion is defined %}
 bastion
+{% endif %}
 {% if cns is defined %}
 glusterfs
 {% endif %}
@@ -170,10 +172,12 @@ openshift_grafana_node_selector={"node-role.kubernetes.io/infra":"true"}
 {{lb}}
 {% endif %}
 
+{% if cns is defined %}
 [glusterfs]
 {% for cns_node in cns %}
 {{cns_node}} glusterfs_ip={{ cns_hosts[loop.index0] }} glusterfs_devices='["/dev/{{ocs_disk}}"]'
 {% endfor %}
+{% endif %}
 
 
 [nodes]
@@ -191,7 +195,7 @@ openshift_grafana_node_selector={"node-role.kubernetes.io/infra":"true"}
 {{node}} openshift_node_group_name='node-config-compute'
 {% endfor %}
 
-[bastion]
 {% if bastion is defined %}
+[bastion]
 {{bastion}}
 {% endif %}
