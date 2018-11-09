@@ -318,11 +318,11 @@ if [ ! -f env.yml ]; then
     fi
 
     echo "Do you have any Authentication Token for the Red Hat Registry? (this avoid plain text password in inventory)"
-    echo "y [n]"
     echo
     echo "Please refers to the Official Documentation on how to do it:"
     echo "https://docs.openshift.com/container-platform/3.11/install_config/configuring_red_hat_registry.html#install-config-configuring-red-hat-registry"
-
+    echo
+    echo "y [n]"
     read registry_token
 
     if [ "$registry_token" == "y" ]; then
