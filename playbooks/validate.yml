@@ -26,6 +26,16 @@
   roles:
   - check_packages_bastion
 
+- name: ensure subscriptipn
+  gather_facts: no
+  hosts: nodes
+  vars_files:
+  - "{{file_env}}"
+  - "{{file_secrets}}"
+  roles:
+  - check_subscription
+
+
 - name: ensure nodes packages.
   hosts: nodes
   serial: 1
@@ -46,8 +56,6 @@
   tasks:
     - import_role:
         name: check_disks
-    - import_role:
-        name: check_subscription
     - import_role:
         name: check_os
     - import_role:
