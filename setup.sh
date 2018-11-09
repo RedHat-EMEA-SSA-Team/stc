@@ -17,6 +17,8 @@ EOF
 
 echo
 echo "Welcome to STC OpenShift Installation Validator"
+echo "You find help for these questions here:"
+echo "    https://github.com/RedHat-EMEA-SSA-Team/stc/blob/master/docs/bb0.adoc#prepare-configuration-file"
 
 if [ ! -f env.yml ]; then
 
