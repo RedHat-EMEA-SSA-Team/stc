@@ -21,7 +21,10 @@ ansible_become={% if ssh_user == "root" %}no{% else %}yes{% endif %}
 # https://github.com/openshift/openshift-ansible/blob/master/DEPLOYMENT_TYPES.md
 deployment_type=openshift-enterprise
 oreg_url=registry.redhat.io/openshift3/ose-${component}:${version}
-{% if rhn_username is defined and rhn_password is defined %}
+{% if registry_token_user is defined and registry_token is defined %}
+oreg_auth_user={{registry_token_user}}
+oreg_auth_password={{registry_token}}
+{% else %}
 oreg_auth_user={{rhn_username}}
 oreg_auth_password={{rhn_password}}
 {% endif %}
