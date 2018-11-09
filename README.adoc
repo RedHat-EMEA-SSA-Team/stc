@@ -43,8 +43,8 @@ MVS includes following services:
 [cols="1,1",options="header"]
 |=======
 |Version |Description
-|3.11 | Latest OCP release
-|3.10 | Current STC default
+|3.11 | STC default OCP version
+|3.10 | OCP previous version
 |=======
 
 For a complete list of technical pre-requisites, please check https://github.com/RedHat-EMEA-SSA-Team/stc/blob/master/docs/getstarted.adoc[this document].

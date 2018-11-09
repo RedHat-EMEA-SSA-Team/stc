@@ -103,7 +103,7 @@ The content of this YAML will be generated in the stc directory and used by the 
 Generated configuration:
 
 ********************* STC Conf file *********************
-ocp_version: 3.10
+ocp_version: 3.11
 api_dns: openshift.example.com
 apps_dns: apps.example.com
 bastion: bastion.example.com
@@ -208,9 +208,9 @@ Welcome to STC OpenShift Installation Validator
 Defaults value are shown in []
 
 Please select OCP Version to install: 3.11, 3.10
-3.11 [3.10]
+[3.11] 3.10
 
-*** selected 3.10
+*** selected 3.11
 
 Please insert Cluster hostname (API DNS):
 openshift.example.com
@@ -272,7 +272,7 @@ ocp39
 Generated configuration:
 
 ********************* STC Conf file *********************
-ocp_version: 3.10
+ocp_version: 3.11
 api_dns: openshift.example.com
 apps_dns: apps.example.com
 bastion: bastion.example.com
