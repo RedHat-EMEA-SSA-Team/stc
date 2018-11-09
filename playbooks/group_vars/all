@@ -56,3 +56,7 @@ docker_prepull:
 - registry.access.redhat.com/openshift3/ose-pod
 - registry.access.redhat.com/openshift3/ose-node
 - registry.access.redhat.com/openshift3/ose-docker-builder
+post_install_components:
+- console
+- monitoring
+- metering
