@@ -280,7 +280,7 @@ if [ ! -f env.yml ]; then
         echo "rhn_username: $rhsm_username" >> env.yml 
 
         echo '*** registering host to RHSM with username '$rhsm_username
-        sudo subscription-manager register --username $rhsm_username
+        sudo subscription-manager register --username $rhsm_username --force
         if [ $? != 0 ]; then
             echo "Error while registering host, please verify credentials"
             exit 1
