@@ -240,23 +240,26 @@ if [ ! -f env.yml ]; then
 
     echo "ssh_user: $ssh_user" >> env.yml
 
-    while [ -z $install_logging ]
+    while [ "$install_logging" != "y" -a "$install_logging" != "n" ]
     do
       echo "Do you want to install Log aggregation (EFK stack)"
-      echo "n [y]"
+      echo "[y] n"
       read -r install_logging
+      [[ -z $install_logging ]] && install_logging="y"
     done
 
     echo "install_logging: $install_logging" >> env.yml
 
-    while [ -z $install_metrics ]
+    while [ "$install_metrics" != "y" -a "$install_metrics" != "n" ]
     do
       echo "Do you want to install Metrics (Cassandra-Hawkular stack)"
-      echo "n [y]"
+      echo "[y] n"
       read -r install_metrics
+      [[ -z $install_metrics ]] && install_metrics="y"
     done
 
     echo "install_metrics: $install_metrics" >> env.yml
+
 
     while  [ "$subscription" != "rhsm" -a "$subscription" != "satellite" ];
     do
@@ -275,6 +278,8 @@ if [ ! -f env.yml ]; then
         done
 
         echo "rhn_username: $rhsm_username" >> env.yml
+
+        
 
         echo '*** registering host to RHSM with username '$rhsm_username
         sudo subscription-manager register --username $rhsm_username
