@@ -277,9 +277,7 @@ if [ ! -f env.yml ]; then
             read -r rhsm_username
         done
 
-        echo "rhn_username: $rhsm_username" >> env.yml
-
-        
+        echo "rhn_username: $rhsm_username" >> env.yml 
 
         echo '*** registering host to RHSM with username '$rhsm_username
         sudo subscription-manager register --username $rhsm_username
@@ -318,6 +316,34 @@ if [ ! -f env.yml ]; then
         echo "subscription_activationkey: $ak" >> env.yml
         echo "subscription_org_id: $org_id" >> env.yml
     fi
+
+    echo "Do you have any Authentication Token for the Red Hat Registry? (this avoid plain text password in inventory)"
+    echo "y [n]"
+    echo
+    echo "Please refers to the Official Documentation on how to do it:"
+    echo "https://docs.openshift.com/container-platform/3.11/install_config/configuring_red_hat_registry.html#install-config-configuring-red-hat-registry"
+
+    read registry_token
+
+    if [ "$registry_token" == "y" ]; then
+        while  [ -z $oreg_token_user ]
+        do
+            echo "Please insert Registry Service Accounts Token Username"
+            read -r oreg_token_user
+        done
+
+        echo
+        echo "registry_token_user: $oreg_token_user" >> env.yml
+
+
+        while  [ -z $oreg_token ]
+        do
+            echo "Please insert Registry Service Accounts Token"
+            read -r oreg_token
+        done
+        echo "registry_token: $oreg_token" >> env.yml
+    fi
+
 
     echo
     echo "Generated configuration:"
