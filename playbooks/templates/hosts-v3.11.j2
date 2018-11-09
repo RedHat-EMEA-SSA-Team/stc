@@ -112,7 +112,7 @@ openshift_storage_glusterfs_block_host_vol_size=50
 openshift_storage_glusterfs_block_storageclass=true
 
 # Metrics deployment
-openshift_metrics_install_metrics=true
+openshift_metrics_install_metrics={% if install_metrics == 'y'}true{% else %}false{% endif %}
 openshift_metrics_hawkular_hostname=metrics.{{ apps_dns | replace("*.","")}}
 openshift_metrics_cassandra_replicas=1
 openshift_metrics_cassandra_limits_memory=2Gi
@@ -123,7 +123,7 @@ openshift_metrics_cassandra_storage_type=dynamic
 openshift_metrics_cassandra_pvc_storage_class_name=glusterfs-ocs-block
 
 # Logging deployment
-openshift_logging_install_logging=true
+openshift_logging_install_logging={% if install_logging == 'y'}true{% else %}false{% endif %}
 openshift_logging_kibana_hostname=logging.{{ apps_dns | replace("*.","")  }}
 openshift_logging_use_ops=false
 openshift_logging_public_master_url=https://{{api_dns}}:8443
@@ -150,11 +150,7 @@ openshift_cluster_monitoring_operator_node_selector={"node-role.kubernetes.io/in
 # openshift_enable_olm=true
 # openshift_additional_registry_credentials=[{'host':'registry.connect.redhat.com','user':'your_user','password':'your_pwd','test_image':'mongodb/enterprise-operator:0.3.2'}]
 
-# Grafana
-openshift_grafana_storage_type=pvc
-openshift_grafana_sc_name=glusterfs-ocs
-openshift_grafana_storage_volume_size=1Gi
-openshift_grafana_node_selector={"node-role.kubernetes.io/infra":"true"}
+
 
 
 [masters]

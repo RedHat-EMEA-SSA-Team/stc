@@ -77,7 +77,7 @@ if [ ! -f env.yml ]; then
 		flavor="standard"
 	fi
     done
-    
+
     echo
     echo "Selected $flavor Flavor"
     echo
@@ -96,7 +96,7 @@ if [ ! -f env.yml ]; then
              n_masters=3
              n_nodes=3
              ;;
-        mini) 
+        mini)
              n_masters=1
              n_infranodes=1
              n_nodes=1
@@ -105,7 +105,7 @@ if [ ! -f env.yml ]; then
              n_masters=3
              n_infranodes=3
              n_nodes=3
-             ;;    
+             ;;
     esac
 
     echo "masters:" >> env.yml
@@ -190,7 +190,7 @@ if [ ! -f env.yml ]; then
         done
 
         echo "proxy_https: $proxy_https" >> env.yml
-        
+
         echo "Please insert No Proxy (leave blank if any, automatically adding localhost,127.0.0.1,.svc)"
         read -r proxy_no
 
@@ -240,6 +240,24 @@ if [ ! -f env.yml ]; then
 
     echo "ssh_user: $ssh_user" >> env.yml
 
+    while [ -z $install_logging ]
+    do
+      echo "Do you want to install Log aggregation (EFK stack)"
+      echo "n [y]"
+      read -r install_logging
+    done
+
+    echo "install_logging: $install_logging" >> env.yml
+
+    while [ -z $install_metrics ]
+    do
+      echo "Do you want to install Metrics (Cassandra-Hawkular stack)"
+      echo "n [y]"
+      read -r install_metrics
+    done
+
+    echo "install_metrics: $install_metrics" >> env.yml
+
     while  [ "$subscription" != "rhsm" -a "$subscription" != "satellite" ];
     do
         echo "Please select Subscription management: RHSM or Satellite"
@@ -281,7 +299,7 @@ if [ ! -f env.yml ]; then
             echo "Please insert Organization ID:"
             read -r org_id
         done
-        
+
         echo
 
         while  [ -z $ak ]
