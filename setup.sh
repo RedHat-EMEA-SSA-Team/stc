@@ -1,8 +1,8 @@
 #!/bin/bash
 
-OCP_VERSION=3.10
+OCP_VERSION=3.11
 CNS_NODES=3
-ANSIBLE_VERSION=2.4
+ANSIBLE_VERSION=2.6
 
 cat << EOF
  ____ _____ ____
@@ -27,7 +27,7 @@ if [ ! -f env.yml ]; then
 
 
     echo "Please select OCP Version to install: 3.11, 3.10"
-    echo "3.11 [3.10]"
+    echo "[3.11] 3.10"
     read ocp_version
 
     case "$ocp_version" in
@@ -347,10 +347,12 @@ fi
 echo '*** enable repos needed for OCP'
 echo '*** disable all repos'
 sudo subscription-manager repos --disable='*'
-sudo subscription-manager repos --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-ose-$OCP_VERSION-rpms --enable=rhel-7-fast-datapath-rpms
+sudo subscription-manager repos --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-ose-$OCP_VERSION-rpms
 
-if [ "$OCP_VERSION" == "3.11" ]; then
-	ANSIBLE_VERSION="2.6"
+if [ "$OCP_VERSION" == "3.10" ]; then
+	ANSIBLE_VERSION="2.4"
+	sudo subscription-manager repos --enable=rhel-7-fast-datapath-rpms
+
 fi
 echo '*** enable ansible '$ANSIBLE_VERSION' repo for OCP '$OCP_VERSION
 sudo subscription-manager repos --enable=rhel-7-server-ansible-$ANSIBLE_VERSION-rpms
