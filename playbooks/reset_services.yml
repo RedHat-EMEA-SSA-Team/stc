@@ -1,0 +1,53 @@
+- name: Reset some services
+  hosts: all
+  gather_facts: no
+  vars_files:
+  - "{{file_env}}"
+  tasks:
+  - name: Flush iptables                                                                                               
+    iptables:                                                                                                          
+      flush: yes                                                                                                       
+ 
+  - name: Make sure firewalld is stopped                                                                               
+    service:                                                                                                           
+      name: firewalld                                                                                                  
+      enabled: false                                                                                                   
+      state: stopped                                                                                                   
+ 
+  - name: Start iptables service                                                                                       
+    service:                                                                                                           
+      name: iptables                                                                                                   
+      enabled: true                                                                                                    
+      state: started
+ 
+  - name: Uninstall chrony
+    yum:
+      name: chrony
+      state: absent
+ 
+  - name: Add iptables NTP INPUT
+    iptables:
+      chain: INPUT
+      protocol: udp
+      destination_port: 123
+      jump: ACCEPT
+      comment: "Accept NTP traffic"
+ 
+  - name: Add iptables NTP OUTPUT
+    iptables:
+      chain: OUTPUT
+      protocol: udp
+      source_port: 123
+      jump: ACCEPT
+      comment: "Accept NTP traffic"
+     
+  - name: Set NTP
+    shell: timedatectl set-ntp yes
+    async: 1
+    poll: 0
+ 
+  - name: Restart NTP service
+    service:
+      name: ntpd
+      state: restarted
+      enabled: yes

@@ -46,6 +46,7 @@
   - check_networking
   - check_packages_nodes
 
+- import_playbook: reset_services.yml
 
 - name: Validate environment
   gather_facts: no
