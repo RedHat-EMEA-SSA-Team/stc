@@ -29,19 +29,19 @@
         rhn_password: "{{rhn_password}}"
   - name: Verify Masters IP addresses
     local_action: |
-      shell ping -c 1 {{item}} | grep "PING"| sed -e 's/[^a-zA-Z0-9.]/ /g' | awk '{print $3 ": {{item }}" }' >> {{file_ip_data}}
+      shell ping -c 1 {{item}} | grep "PING"| sed -e 's/[^a-zA-Z0-9.-]/ /g' | awk '{print $3 ": {{item }}" }' >> {{file_ip_data}}
     with_items: "{{masters}}"
   - name: Verify Infranodes IP addresses
     local_action: |
-      shell ping -c 1 {{item}} | grep "PING"| sed -e 's/[^a-zA-Z0-9.]/ /g' | awk '{print $3 ": {{item }}" }' >> {{file_ip_data}}
+      shell ping -c 1 {{item}} | grep "PING"| sed -e 's/[^a-zA-Z0-9.-]/ /g' | awk '{print $3 ": {{item }}" }' >> {{file_ip_data}}
     with_items: "{{infranodes | default([])}}"
   - name: Verify Nodes IP addresses
     local_action: |
-      shell ping -c 1 {{item}} | grep "PING"| sed -e 's/[^a-zA-Z0-9.]/ /g' | awk '{print $3 ": {{item }}" }' >> {{file_ip_data}}
+      shell ping -c 1 {{item}} | grep "PING"| sed -e 's/[^a-zA-Z0-9.-]/ /g' | awk '{print $3 ": {{item }}" }' >> {{file_ip_data}}
     with_items: "{{nodes}}"
   - name: Verify CNS IP addresses
     local_action: |
-      shell ping -c 1 {{item}} | grep "PING"| sed -e 's/[^a-zA-Z0-9.]/ /g' | awk '{print $3 }'
+      shell ping -c 1 {{item}} | grep "PING"| sed -e 's/[^a-zA-Z0-9.-]/ /g' | awk '{print $3 }'
     with_items: "{{cns | default([])}}"
     register: cns_data
   - local_action: |

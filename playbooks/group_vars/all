@@ -29,7 +29,6 @@ packages:
 packages_jumphost:
 - openshift-ansible
 firewall_ports:
-- 4789
 - 8443
 - 80
 - 443
