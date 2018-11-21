@@ -115,7 +115,7 @@ openshift_storage_glusterfs_block_host_vol_size=50
 openshift_storage_glusterfs_block_storageclass=true
 
 # Metrics deployment
-openshift_metrics_install_metrics={% if install_metrics == 'y' %}true{% else %}false{% endif %}
+openshift_metrics_install_metrics={{ true if install_metrics == 'y' else false }}
 openshift_metrics_hawkular_hostname=metrics.{{ apps_dns | replace("*.","")}}
 openshift_metrics_cassandra_replicas=1
 openshift_metrics_cassandra_limits_memory=2Gi
@@ -126,7 +126,7 @@ openshift_metrics_cassandra_storage_type=dynamic
 openshift_metrics_cassandra_pvc_storage_class_name=glusterfs-ocs-block
 
 # Logging deployment
-openshift_logging_install_logging={% if install_logging == 'y' %}true{% else %}false{% endif %}
+openshift_logging_install_logging={{ true if install_logging == 'y' else false }}
 openshift_logging_kibana_hostname=logging.{{ apps_dns | replace("*.","")  }}
 openshift_logging_use_ops=false
 openshift_logging_public_master_url=https://{{api_dns}}:8443
