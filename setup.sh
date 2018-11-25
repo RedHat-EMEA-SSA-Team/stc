@@ -260,7 +260,6 @@ if [ ! -f env.yml ]; then
 
     echo "install_metrics: $install_metrics" >> env.yml
 
-
     while  [ "$subscription" != "rhsm" -a "$subscription" != "satellite" ];
     do
         echo "Please select Subscription management: RHSM or Satellite"
@@ -269,6 +268,32 @@ if [ ! -f env.yml ]; then
         [[ -z $subscription ]] && subscription="rhsm"
     done
 
+    echo "Do you want to configure NTP servers? (NTP will be installed anyway if not present)"
+    echo "y [n]"
+    echo "ntp_servers:" >> env.yml
+    read ntp
+
+    if [[ $ntp == "y"  ]]; then
+
+        echo "Please insert number of NTP server to configure, default 1"
+        read ntp_servers
+        NTP=1
+        if [ -n "$ntp_servers" -a "$ntp_servers" -gt 1 -a "$ntp_servers" -lt 6 ]; then
+                NTP=$ntp_servers
+                echo "zio $ntp_servers"
+        fi
+
+        for (( c=1; c<=$NTP; c++ ))
+        do
+           while  [ -z $ntp_i ]
+           do
+              echo "Please insert NTP server n.$c:"
+              read -r ntp_i
+           done
+        echo "- $ntp_i" >> env.yml
+        ntp_i=""
+        done
+    fi
 
     if [ "$subscription" == "rhsm" ]; then
         while  [ -z $rhsm_username ]

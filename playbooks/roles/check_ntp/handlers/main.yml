@@ -1,0 +1,12 @@
+---
+- name: Restart chrony
+  service:
+    name: chrony
+    state: restarted
+
+- name: Restart ntp
+  service:
+    name: ntp
+    state: restarted
+
+

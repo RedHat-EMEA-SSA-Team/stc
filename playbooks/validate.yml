@@ -68,6 +68,9 @@
     - import_role:
         name: check_selinux
     - import_role:
+        name: check_ntp
+      when: ntp_servers is defined
+    - import_role:
         name: check_storage
       when: inventory_hostname in groups['nodes']
     - import_role:

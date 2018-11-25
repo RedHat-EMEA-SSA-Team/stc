@@ -1,0 +1,43 @@
+---
+- name: Determine if chrony is installed
+  command: rpm -q chrony
+  failed_when: false
+  register: chrony_installed
+
+- name: Determine if ntp is installed
+  command: rpm -q ntp
+  failed_when: false
+  register: ntp_installed
+
+- name: Install chrony package
+  package:
+    name: chrony
+    state: present
+  when: ntp_installed.rc != 0
+
+- name: Install ntp package
+  package:
+    name: ntp
+    state: present
+  when: chrony_installed.rc != 0
+
+- name: Create chrony conf
+  template:
+    src: templates/chrony.j2
+    dest: /etc/chrony.conf
+    mode: 0644
+  notify: Restart chrony
+  when: ntp_installed.rc != 0 and ntp_servers is defined and (ntp_servers|length > 0)
+
+- name: Create ntp conf
+  template:
+    src: templates/chrony.j2
+    dest: /etc/ntp.conf
+    mode: 0644
+  notify: Restart ntp
+  when: chrony_installed.rc != 0 and ntp_servers is defined and (ntp_servers|length > 0)
+
+ 
+- name: Start and enable chronyd/ntpd
+  command: timedatectl set-ntp true
+
