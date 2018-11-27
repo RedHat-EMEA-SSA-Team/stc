@@ -11,6 +11,6 @@
 - name: Signal if NTP is not enable or synchronized
   debug:
     msg: |
-      {{ ntp_enable.stdout }}
+      {{ ntp_enabled.stdout }}
   when: ntp_enabled.rc != 0 or ntp_synchronized.rc != 0
 
