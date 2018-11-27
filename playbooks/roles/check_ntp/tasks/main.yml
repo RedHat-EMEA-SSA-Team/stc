@@ -13,13 +13,7 @@
   package:
     name: chrony
     state: present
-  when: ntp_installed.rc != 0
-
-- name: Install ntp package
-  package:
-    name: ntp
-    state: present
-  when: chrony_installed.rc != 0
+  when: chrony_installed.rc != 0 and ntp_installed.rc != 0
 
 - name: Create chrony conf
   template:
@@ -31,12 +25,11 @@
 
 - name: Create ntp conf
   template:
-    src: templates/chrony.j2
+    src: templates/ntp.j2
     dest: /etc/ntp.conf
     mode: 0644
   notify: Restart ntp
   when: chrony_installed.rc != 0 and ntp_servers is defined and (ntp_servers|length > 0)
-
  
 - name: Start and enable chronyd/ntpd
   command: timedatectl set-ntp true
