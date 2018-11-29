@@ -1,9 +1,9 @@
 provider "openstack" {
-  user_name   = "${var.openstack_user_name}"
-  tenant_name = "${var.openstack_tenant_name}"
-  password    = "${var.openstack_password}"
-  auth_url    = "${var.openstack_auth_url}"
-  region      = "${var.openstack_region}"
+  user_name   = "${var.OS_USERNAME}"
+  tenant_name = "${var.OS_PROJECT_NAME}"
+  password    = "${var.OS_PASSWORD}"
+  auth_url    = "${var.OS_AUTH_URL}"
+  region      = "${var.OS_REGION_NAME}"
 }
 
 data "openstack_images_image_v2" "rhel" {

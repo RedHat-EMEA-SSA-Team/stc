@@ -1,10 +1,17 @@
 
+/*
 
-variable "openstack_user_name"   { type    = "string" }
-variable "openstack_tenant_name" { type    = "string" }
-variable "openstack_password"    { type    = "string" }
-variable "openstack_auth_url"    { type    = "string" }
-variable "openstack_region"      { type    = "string" default = "RegionOne" }
+ To transform the openstack env variables into the terraform one:
+
+   eval $(env | grep ^OS_ | xargs -n1 printf "export TF_VAR_%s\n" )
+
+*/
+
+variable "OS_USERNAME"     { type    = "string" }
+variable "OS_PROJECT_NAME" { type    = "string" }
+variable "OS_PASSWORD"     { type    = "string" }
+variable "OS_AUTH_URL"     { type    = "string" }
+variable "OS_REGION_NAME"  { type    = "string" default = "RegionOne" }
 
 variable "master_count" {
   type    = "string"
