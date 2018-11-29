@@ -22,6 +22,7 @@ data "openstack_networking_subnet_v2" "public" {
 output "cidr" {
   value = "${data.openstack_networking_subnet_v2.private.cidr}"
 }
+
 /*
 
    Security groups
@@ -190,9 +191,21 @@ resource "openstack_networking_floatingip_v2" "single_ocp" {
   port_id = "${openstack_lb_loadbalancer_v2.single_ocp.vip_port_id}"
 }
 
+
+output "public_ip" {
+  value = "${openstack_networking_floatingip_v2.single_ocp.address}"
+}
+
 resource "openstack_lb_listener_v2" "single_ocp_admin_api" {
   protocol        = "HTTPS"
   protocol_port   = 8443
+  loadbalancer_id = "${openstack_lb_loadbalancer_v2.single_ocp.id}"
+}
+
+
+resource "openstack_lb_listener_v2" "single_ocp_bastion" {
+  protocol        = "TCP"
+  protocol_port   = 22
   loadbalancer_id = "${openstack_lb_loadbalancer_v2.single_ocp.id}"
 }
 
@@ -217,6 +230,13 @@ resource "openstack_lb_pool_v2" "single_ocp_admin_api" {
 }
 
 
+resource "openstack_lb_pool_v2" "single_ocp_bastion" {
+  protocol    = "TCP"
+  lb_method   = "ROUND_ROBIN"
+  listener_id = "${openstack_lb_listener_v2.single_ocp_bastion.id}"
+}
+
+
 resource "openstack_lb_pool_v2" "single_ocp_router_https" {
   protocol    = "HTTPS"
   lb_method   = "ROUND_ROBIN"
@@ -228,6 +248,16 @@ resource "openstack_lb_pool_v2" "single_ocp_router_http" {
   lb_method   = "ROUND_ROBIN"
   listener_id = "${openstack_lb_listener_v2.single_ocp_router_http.id}"
 }
+
+
+resource "openstack_lb_monitor_v2" "single_ocp_bastion" {
+  pool_id     = "${openstack_lb_pool_v2.single_ocp_bastion.id}"
+  type        = "TCP"
+  delay       = 20
+  timeout     = 10
+  max_retries = 5
+}
+
 
 resource "openstack_lb_monitor_v2" "single_ocp_admin_api" {
   pool_id     = "${openstack_lb_pool_v2.single_ocp_admin_api.id}"
@@ -264,6 +294,41 @@ resource "openstack_lb_monitor_v2" "single_ocp_router_http" {
    Instances
 
 */
+
+
+
+resource "openstack_compute_instance_v2" "bastion" {
+  name = "bastion"
+  flavor_name = "m1.small"
+  key_pair = "default"
+  security_groups = ["default","ssh"]
+  network {
+    name = "private"
+  }
+
+  metadata {
+    role = "bastion"
+  }
+
+  block_device {
+    uuid                  = "${data.openstack_images_image_v2.rhel.id}"
+    source_type           = "image"
+    destination_type      = "volume"
+    volume_size	          = 40
+    boot_index            = 0
+    delete_on_termination = true
+  }
+}
+
+resource "openstack_lb_member_v2" "single_ocp_bastion" {
+  address  = "${openstack_compute_instance_v2.bastion.access_ip_v4}"
+  protocol_port = 22
+  pool_id   = "${openstack_lb_pool_v2.single_ocp_bastion.id}"
+  subnet_id = "${data.openstack_networking_subnet_v2.private.id}"
+}
+
+
+
 resource "openstack_compute_instance_v2" "masters" {
   count = "${var.master_count}"
   name = "master_${count.index}"
