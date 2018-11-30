@@ -19,6 +19,16 @@ data "openstack_networking_subnet_v2" "public" {
   name = "public_subnet"
 }
 
+data "template_file" "script" {
+  template = "${file("${path.module}/terraform.cloud-init.tpl")}"
+
+  vars {
+    rh_subscription_username  = "${var.rh_subscription_username}"
+    rh_subscription_password  = "${var.rh_subscription_password}"
+    rh_subscription_pool      = "${var.rh_subscription_pool}"
+  }
+}
+
 output "cidr" {
   value = "${data.openstack_networking_subnet_v2.private.cidr}"
 }
@@ -299,6 +309,7 @@ resource "openstack_lb_monitor_v2" "single_ocp_router_http" {
 
 resource "openstack_compute_instance_v2" "bastion" {
   name = "bastion"
+  user_data     = "${data.template_file.script.rendered}"
   flavor_name = "m1.small"
   key_pair = "default"
   security_groups = ["default","ssh"]
@@ -331,8 +342,9 @@ resource "openstack_lb_member_v2" "single_ocp_bastion" {
 
 resource "openstack_compute_instance_v2" "masters" {
   count = "${var.master_count}"
-  name = "master_${count.index}"
-  flavor_name = "m1.small"
+  name = "master${count.index}"
+  user_data     = "${data.template_file.script.rendered}"
+  flavor_name = "ocp.generic"
   key_pair = "default"
   security_groups = ["default","ssh","ocp_internal_communication","master_api"]
   network {
@@ -382,8 +394,9 @@ resource "openstack_lb_member_v2" "single_ocp_admin_api" {
 
 resource "openstack_compute_instance_v2" "infras" {
   count = "${var.infra_count}"
-  name = "infra_${count.index}"
-  flavor_name = "m1.small"
+  name = "infra${count.index}"
+  user_data     = "${data.template_file.script.rendered}"
+  flavor_name = "ocp.generic"
   key_pair = "default"
   security_groups = ["default","ssh","ocp_internal_communication","router"]
   network {
@@ -443,8 +456,9 @@ resource "openstack_lb_member_v2" "single_ocp_router_https" {
 
 resource "openstack_compute_instance_v2" "nodes" {
   count = "${var.node_count}"
-  name = "node_${count.index}"
-  flavor_name = "m1.small"
+  name = "node${count.index}"
+  user_data     = "${data.template_file.script.rendered}"
+  flavor_name = "ocp.generic"
   key_pair = "default"
   security_groups = ["default","ssh","ocp_internal_communication"]
   network {

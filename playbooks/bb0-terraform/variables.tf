@@ -13,6 +13,10 @@ variable "OS_PASSWORD"     { type    = "string" }
 variable "OS_AUTH_URL"     { type    = "string" }
 variable "OS_REGION_NAME"  { type    = "string" default = "RegionOne" }
 
+variable "rh_subscription_username"     { type    = "string" }
+variable "rh_subscription_password"     { type    = "string" }
+variable "rh_subscription_pool"         { type    = "string" }
+
 variable "master_count" {
   type    = "string"
   default = "1"
