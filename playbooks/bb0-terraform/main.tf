@@ -309,7 +309,7 @@ resource "openstack_lb_monitor_v2" "single_ocp_router_http" {
 
 resource "openstack_compute_instance_v2" "bastion" {
   name = "bastion"
-  user_data     = "${data.template_file.script.rendered}"
+  user_data     = "${data.template_file.script.rendered}\nhostname: bastion\nfqdn: bastion"
   flavor_name = "m1.small"
   key_pair = "default"
   security_groups = ["default","ssh"]
@@ -343,7 +343,7 @@ resource "openstack_lb_member_v2" "single_ocp_bastion" {
 resource "openstack_compute_instance_v2" "masters" {
   count = "${var.master_count}"
   name = "master${count.index}"
-  user_data     = "${data.template_file.script.rendered}"
+  user_data     = "${data.template_file.script.rendered}\nhostname: master${count.index}\nfqdn: master${count.index}"
   flavor_name = "ocp.generic"
   key_pair = "default"
   security_groups = ["default","ssh","ocp_internal_communication","master_api"]
@@ -395,7 +395,7 @@ resource "openstack_lb_member_v2" "single_ocp_admin_api" {
 resource "openstack_compute_instance_v2" "infras" {
   count = "${var.infra_count}"
   name = "infra${count.index}"
-  user_data     = "${data.template_file.script.rendered}"
+  user_data     = "${data.template_file.script.rendered}\nhostname: infra${count.index}\nfqdn: infra${count.index}"
   flavor_name = "ocp.generic"
   key_pair = "default"
   security_groups = ["default","ssh","ocp_internal_communication","router"]
@@ -457,7 +457,7 @@ resource "openstack_lb_member_v2" "single_ocp_router_https" {
 resource "openstack_compute_instance_v2" "nodes" {
   count = "${var.node_count}"
   name = "node${count.index}"
-  user_data     = "${data.template_file.script.rendered}"
+  user_data     = "${data.template_file.script.rendered}\nhostname: node${count.index}\nfqdn: node${count.index}"
   flavor_name = "ocp.generic"
   key_pair = "default"
   security_groups = ["default","ssh","ocp_internal_communication"]
