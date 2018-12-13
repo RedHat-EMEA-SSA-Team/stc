@@ -438,7 +438,7 @@ resource "openstack_lb_member_v2" "single_ocp_router_http" {
   count = "${var.master_count}"
   address  = "${element(openstack_compute_instance_v2.infras.*.access_ip_v4, count.index)}"
 
-  protocol_port = 8443
+  protocol_port = 80
   pool_id   = "${openstack_lb_pool_v2.single_ocp_router_http.id}"
   subnet_id = "${data.openstack_networking_subnet_v2.private.id}"
 }
@@ -447,7 +447,7 @@ resource "openstack_lb_member_v2" "single_ocp_router_https" {
   count = "${var.master_count}"
   address  = "${element(openstack_compute_instance_v2.infras.*.access_ip_v4, count.index)}"
 
-  protocol_port = 8443
+  protocol_port = 443
   pool_id   = "${openstack_lb_pool_v2.single_ocp_router_https.id}"
   subnet_id = "${data.openstack_networking_subnet_v2.private.id}"
 }
