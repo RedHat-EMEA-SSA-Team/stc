@@ -16,16 +16,9 @@
 - name: Disable all repos
   shell: |
     subscription-manager repos --disable='*'
-  when: subscribe.changed or subscribe_sat.changed
 - name: Enable correct repos
   shell: |
     subscription-manager repos --enable='{{item}}'
   with_items:
   - "{{repos}}"
-  when: subscribe.changed or subscribe_sat.changed
-- name: Enable correct repos for
-  shell: |
-    subscription-manager repos --enable='{{item}}'
-  with_items:
-  - "{{repos}}"
-  when: (subscribe.changed or subscribe_sat.changed) and item != ''
+  when: item != ''
