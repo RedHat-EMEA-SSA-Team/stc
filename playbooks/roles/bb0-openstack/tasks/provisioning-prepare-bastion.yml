@@ -1,0 +1,94 @@
+---
+- name: "Wait for bastion {{ ansible_host }}:22 (SSH)"
+  connection: local
+  wait_for:
+    port: 22
+    host: "{{ ansible_host }}"
+    search_regex: OpenSSH
+    delay: 10
+
+- name: Copy ssh key to bastion
+  connection: ssh
+  copy:
+    src: "{{ playbook_dir }}/id_rsa"
+    dest: ~/.ssh/id_rsa
+    mode: 0600
+
+- name: Copy ssh pub to bastion
+  connection: ssh
+  copy:
+    src: "{{ playbook_dir }}/id_rsa.pub"
+    dest: ~/.ssh/id_rsa.pub
+    mode: 0600
+
+- name: Create ~/stc bastion
+  connection: ssh
+  file:
+    path: ~/stc/
+    state: directory
+    mode: 0755
+
+- name: Checkout STC on bastion
+  connection: ssh
+  unarchive:
+    src: https://github.com/RedHat-EMEA-SSA-Team/stc/archive/master.tar.gz
+    dest: ~/stc/
+    extra_opts: [--strip-components=1]
+    remote_src: yes
+
+# - debug: var=hostvars
+
+- name: Create STC env.yml
+  connection: ssh
+  template:
+    src: env.yml.j2
+    dest: ~/stc/env.yml
+    mode: 0660
+
+- name: Create STC secrets.yml
+  connection: ssh
+  template:
+    src: secrets.yml.j2
+    dest: ~/stc/secrets.yml
+    mode: 0660
+
+- name: Register and subscribe.
+  connection: ssh
+  become: true
+  redhat_subscription:
+    state: present
+    username: "{{ lookup('env','STC_RHN_USERNAME') }}"
+    password: "{{ lookup('env','STC_RHN_PASSWORD') }}"
+    pool_ids:
+      - "{{ lookup('env','STC_SUBSCRIPTION_POOL_ID') }}"
+
+- name: Disable all RHSM repositories
+  connection: ssh
+  become: true
+  rhsm_repository:
+    name: '*'
+    state: disabled
+
+- name: Disable all repositories except rhel-7-server-rpms
+  connection: ssh
+  become: true
+  rhsm_repository:
+    name: "{{ item }}"
+    state: enabled
+  with_items:
+    - "rhel-7-server-rpms"
+    - "rhel-7-server-extras-rpms"
+    - "rhel-7-server-ose-3.11-rpms"
+    - "rhel-7-server-ansible-2.6-rpms"
+
+- name: Install necessary packages
+  connection: ssh
+  become: true
+  yum:
+    name:
+      - git
+      - ansible
+      - tmux
+      - nc
+      - screen
+    state: present

@@ -1,0 +1,70 @@
+---
+# vars file for provisioning_openstack
+
+stack_name: openshift
+heat_template: files/openshift_single_lbaas.yaml
+bastion_flavor: "m1.small"
+master_flavor: "m1.large"
+infra_flavor: "m1.large"
+node_flavor: "m1.large"
+
+# In GB
+master_container_disk_size: 15
+master_glusterfs_disk_size: 100
+infra_container_disk_size: 15
+infra_glusterfs_disk_size: 100
+node_container_disk_size: 15
+node_glusterfs_disk_size: 100
+
+# domain_name: "{{ domain_name }}"
+# external_network: "{{ external_network }}"
+# service_network: "{{ service_network }}"
+# service_subnet: "{{ service_subnet_id }}"
+# ssh_key_name: "default"
+# image: "{{ image }}"
+
+
+# vars file for init-openstack
+#
+
+os_sec_groups:
+  - name: ssh_only
+    rules:
+      - { proto: 'tcp', port: 22 }
+  - name: ose3_sdn
+    rules:
+      - { proto: 'tcp', port: 4789 }
+      - { proto: 'udp', port: 4789 }
+  - name: ose3_node
+    rules:
+      - { proto: 'tcp', port: 10250 }
+      - { proto: 'udp', port: 10250 }
+  - name: ose3_master
+    rules:
+      - { proto: 'tcp', port: 53 }
+      - { proto: 'tcp', port: 443 }
+      - { proto: 'tcp', port: 2379 }
+      - { proto: 'tcp', port: 2380 }
+      - { proto: 'tcp', port: 4001 }
+      - { proto: 'tcp', port: 5000 }
+      - { proto: 'tcp', port: 8443 }
+      - { proto: 'tcp', port: 24224}
+      - { proto: 'udp', port: 53 }
+      - { proto: 'udp', port: 2379 }
+      - { proto: 'udp', port: 2380 }
+      - { proto: 'udp', port: 4001 }
+      - { proto: 'udp', port: 24224 }
+  - name: ose3_router
+    rules:
+      - { proto: 'tcp', port: 80 }
+      - { proto: 'tcp', port: 443 }
+      - { proto: 'tcp', port: 8443 }
+  - name: cloudforms
+    rules:
+      - { proto: 'tcp', port: 80 }
+      - { proto: 'tcp', port: 443 }
+  - name: nagios
+    rules:
+      - { proto: 'tcp', port: 80 }
+      - { proto: 'tcp', port: 443 }
+

@@ -1,0 +1,143 @@
+---
+# tasks file for provisioning_openstack
+
+# - include_tasks: validate-parameters.yml
+
+# Just for informations: os_loadbalancer, os_listener, os_pool and os_member need Ansible 2.7.
+# And addional packages: python2-urllib3.noarch  python2-chardet.noarch
+# All thoses ansible modules use the openstack octavia lbaas API.
+
+
+
+- name: Create instance
+  os_server:
+    api_timeout: 360 # Because my lab is not so fast
+    state: present
+    auth:
+      auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+      username: "{{ lookup('env','OS_USERNAME') }}"
+      password: "{{ lookup('env','OS_PASSWORD') }}"
+    name: "{{ inventory_hostname }}"
+    image: "{{ iaas_image }}"
+    flavor: "{{ iaas_machine_size }}"
+    auto_ip: "{{ iaas_public_ip | default(false) }}"
+    key_name: openshift-stc-key
+    security_groups: "{{ os_security_groups }}"
+    network: "{{ iaas_internal_network }}"
+    terminate_volume: true
+    boot_from_volume: true
+    userdata: |
+      #cloud-config
+      # set the locale
+      locale: en_US.UTF-8
+      # timezone: set the timezone for this instance
+      timezone: UTC
+      # hostname: {{ inventory_hostname }}
+      # fqdn: {{ inventory_hostname }}
+  register: return
+
+- name: Set some facts
+  set_fact:
+    instance_data: "{{ return }}"
+
+# - debug:
+#     var: instance_data
+
+# - debug: var=instance_data.openstack.private_v4
+# - debug: var=instance_data.openstack.public_v4
+
+
+- name: Create container storage disk
+  os_volume:
+    state: present
+    auth:
+      auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+      username: "{{ lookup('env','OS_USERNAME') }}"
+      password: "{{ lookup('env','OS_PASSWORD') }}"
+    size: "{{ iaas_container_storage_disk }}"
+    display_name: "{{ inventory_hostname }}_container_storage_disk"
+  when: ( iaas_container_storage_disk | int > 0 )
+
+- name: Attach container storage disk to server
+  os_server_volume:
+    state: present
+    auth:
+      auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+      username: "{{ lookup('env','OS_USERNAME') }}"
+      password: "{{ lookup('env','OS_PASSWORD') }}"
+    server: "{{ inventory_hostname }}"
+    volume: "{{ inventory_hostname }}_container_storage_disk"
+  when: ( iaas_container_storage_disk | int > 0 )
+  register: return
+
+# If I attach a disk to an server, it is important to reset the facts 
+#    because to get the device name (/dev/vd?)
+- name: Set some facts
+  set_fact:
+    instance_data: "{{ return }}"
+  when: ( return.changed == true )
+
+- name: Create glusterfs disk
+  os_volume:
+    state: present
+    auth:
+      auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+      username: "{{ lookup('env','OS_USERNAME') }}"
+      password: "{{ lookup('env','OS_PASSWORD') }}"
+    size: "{{ iaas_glusterfs_disk }}"
+    display_name: "{{ inventory_hostname }}_glusterfs_disk"
+  when: ( iaas_glusterfs_disk | int > 0 )
+
+- name: Attach glusterfs disk to server
+  os_server_volume:
+    state: present
+    auth:
+      auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+      username: "{{ lookup('env','OS_USERNAME') }}"
+      password: "{{ lookup('env','OS_PASSWORD') }}"
+    server: "{{ inventory_hostname }}"
+    volume: "{{ inventory_hostname }}_glusterfs_disk"
+  when: ( iaas_glusterfs_disk | int > 0 )
+  register: return
+
+# If I attach a disk to an server, it is important to reset the facts 
+#    because to get the device name (/dev/vd?)
+- name: Set some facts
+  set_fact:
+    instance_data: "{{ return }}"
+  when: ( return.changed == true )
+
+# - debug: var=instance_data.openstack.private_v4
+# - debug: var=instance_data.openstack.public_v4
+# - debug: var=instance_data.openstack.volumes
+
+- name: Set _container_storage_disk
+  set_fact:
+    container_storage_disk: "{{ instance_data.openstack.volumes | selectattr('display_name','equalto',  inventory_hostname + '_container_storage_disk' ) | first }}"
+  when: ( instance_data.openstack.volumes | selectattr('display_name','equalto', inventory_hostname + '_container_storage_disk' )| list | length > 0 )
+
+- name: Set glusterfs_disk
+  set_fact:
+    glusterfs_disk: "{{ instance_data.openstack.volumes | selectattr('display_name','equalto', inventory_hostname + '_glusterfs_disk' ) | first }}"
+  when: ( instance_data.openstack.volumes | selectattr('display_name','equalto', inventory_hostname + '_glusterfs_disk' )| list | length > 0 )
+
+- name: Set ansible_host if public ip is available
+  set_fact:
+    ansible_host: "{{ instance_data.openstack.public_v4 }}"
+    ansible_ssh_private_key_file: "{{ playbook_dir }}/id_rsa"
+    ansible_user: "cloud-user"
+  when: ( instance_data.openstack.public_v4 is defined and instance_data.openstack.public_v4 != "" )
+
+- include_tasks: provisioning-dns-{{ dns_provider }}.yml
+
+- include_tasks: provisioning-prepare-bastion.yml
+  when: ( inventory_hostname == 'bastion' ) 
+
+- debug: 
+    msg: "Connect to bastion via ssh -i {{ ansible_ssh_private_key_file }} -l {{ ansible_user }} {{ bastion_public_hostname }}"
+  when: ( inventory_hostname == 'bastion' )

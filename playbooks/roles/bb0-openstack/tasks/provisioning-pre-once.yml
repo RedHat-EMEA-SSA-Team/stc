@@ -1,0 +1,81 @@
+---
+
+- name: "{{ playbook_dir }}"
+  command: "ssh-keygen -t rsa -f {{ playbook_dir }}/id_rsa -P ''"
+  args:
+    creates: "{{ playbook_dir }}/id_rsa"
+
+- name: Add ssh
+  os_keypair:
+    auth:
+      auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+      username: "{{ lookup('env','OS_USERNAME') }}"
+      password: "{{ lookup('env','OS_PASSWORD') }}"
+    state: present
+    public_key_file: "{{ playbook_dir }}/id_rsa.pub"
+    name: openshift-stc-key
+
+- name: "Create security groups"
+  os_security_group:
+    name: "{{item.name}}"
+    description: "secgroup {{ item.name }} - managed by ansible"
+    auth:
+      auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+      username: "{{ lookup('env','OS_USERNAME') }}"
+      password: "{{ lookup('env','OS_PASSWORD') }}"
+  with_items:
+     - "{{ os_sec_groups }}"
+
+- name: "Create security group rules"
+  os_security_group_rule:
+    auth:
+      auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+      username: "{{ lookup('env','OS_USERNAME') }}"
+      password: "{{ lookup('env','OS_PASSWORD') }}"
+    security_group: "{{ item.0.name }}"
+    protocol: "{{ item.1.proto }}"
+    port_range_min: "{{ item.1.port }}"
+    port_range_max: "{{ item.1.port }}"
+    remote_ip_prefix: 0.0.0.0/0
+  with_subelements:
+    - "{{ os_sec_groups }}"
+    - rules
+
+
+# - stat: path=ose_host_key
+#   register: st
+
+# - os_keypair:
+#     auth:
+#       auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+#       project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+#       username: "{{ lookup('env','OS_USERNAME') }}"
+#       password: "{{ lookup('env','OS_PASSWORD') }}"
+#     state: absent
+#     name: ose_host_key
+#   when: st.stat.exists == False
+
+# - os_keypair:
+#     auth:
+#       auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+#       project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+#       username: "{{ lookup('env','OS_USERNAME') }}"
+#       password: "{{ lookup('env','OS_PASSWORD') }}"
+#     name: ose_host_key
+#   register: return
+#   when: st.stat.exists == False
+# - name: Save private key to {{inventory_dir}}
+#   copy:
+#     content: "{{return.key.private_key}}"
+#     dest: "{{inventory_dir}}/{{return.key.name}}"
+#     mode: 0600
+#   when: st.stat.exists == False
+
+# - name: Save public key to {{inventory_dir}}
+#   copy:
+#     content: "{{return.key.public_key}}"
+#     dest: "{{inventory_dir}}/{{return.key.name}}.pub"
+#   when: st.stat.exists == False

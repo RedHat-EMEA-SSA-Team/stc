@@ -490,3 +490,44 @@ node03                     : ok=28   changed=8    unreachable=0    failed=0
 === Hacking Building Block Flavors ===
 
 It would be still possible to use a free topology schema editing the `env.yml` for changes such as more nodes or external load balancer
+
+=== OpenStack provisioner ===
+
+How to use the OpenStack provisioner for openstack infrastructure provisioning. If you need more flexibilty please consider: https://access.redhat.com/documentation/en-us/openshift_container_platform/3.11/html/configuring_clusters/install-config-configuring-openstack[OCP documentation]
+
+*Just-for-informations* if you like to actived the openstack cloud provider: A cloud provide change the nodename to the name of the instance. It means it is strongly recommanded that instance name on openstack, openshift nodename and dns name is the same and use FQDN!
+
+[NOTE]
+====
+Please take care that the quotas are set correctly, for example:```openstack quota set --secgroups 100 --volumes 100 --ram 62520 --cores 50 admin```
+====
+
+```
+docker run -ti $(pwd):/work:z quay.io/redhat/stc-openstack-provisioner
+
+export OS_USERNAME=admin
+export OS_PASSWORD=xxxx
+export OS_AUTH_URL=xxxx
+export OS_PROJECT_NAME=admin
+export OS_USER_DOMAIN_NAME=Default
+export OS_PROJECT_DOMAIN_NAME=Default
+export OS_IDENTITY_API_VERSION=3
+
+export STC_RHN_PASSWORD=xxxx
+export STC_RHN_USERNAME=xxx
+export STC_SUBSCRIPTION_POOL_ID=xx
+export STC_REGISTRY_TOKEN_USER=xxx
+export STC_REGISTRY_TOKEN=xxxx
+export STC_FLAVOR=mini  # Only supported flavor at the moment is mini
+export STC_IAAS_MACHINE_SIZE=m1.xlarge # m1.xlarge is Default
+export STC_IAAS_CONTAINER_STORAGE_DISK=15 # Size in GB of container image storage, default 15.
+export STC_IAAS_GLUSTERFS_DISK=100 # Size in GB of gluster disk, default 100.
+export STC_IAAS_INTERNAL_NETWORK=admin # Network name where the VMs are added, default admin.
+
+# Please upload an RHEL Image to your openstack env.
+#   openstack image create --public --disk-format qcow2 --file rhel-server-7.6-update-4-x86_64-kvm.qcow2 rhel-server-7.6-update-4-x86_64
+export STC_IAAS_IMAGE="RHEL IMAGE NAME" # Default rhel-server-7.6-x86_64-kvm
+
+cd /work
+./playbooks/bb00-openstack_provisioning.yml
+```

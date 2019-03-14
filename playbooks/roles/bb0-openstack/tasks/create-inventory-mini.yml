@@ -1,0 +1,90 @@
+---
+
+- set_fact:
+    int_iaas_image: "{{ lookup('env','STC_IAAS_IMAGE') | default('rhel-server-7.6-x86_64-kvm',true) }}"
+    int_iaas_machine_size: "{{ lookup('env','STC_IAAS_MACHINE_SIZE') | default('m1.xlarge',true) }}"
+    int_iaas_container_storage_disk: "{{ lookup('env','STC_IAAS_CONTAINER_STORAGE_DISK') | default('15',true) }}"
+    int_iaas_glusterfs_disk: "{{ lookup('env','STC_IAAS_GLUSTERFS_DISK') | default('100',true) }}"
+    int_iaas_internal_network: "{{ lookup('env','STC_IAAS_INTERNAL_NETWORK') | default('admin',true) }}"
+    int_dns_provider: "{{ lookup('env','STC_DNS_PROVIDER') | default('nip.io',true) }}"
+
+- name: Add masters
+  add_host:
+    name: "master0"
+    groups: 
+    - openstack_instances
+    - masters
+    - cns
+    os_security_groups: 
+    - default
+    - ssh_only
+    - ose3_master
+    - ose3_sdn
+    iaas_machine_size: "{{ int_iaas_machine_size }}"
+
+    iaas_image: "{{ int_iaas_image }}"
+    iaas_container_storage_disk: "{{ int_iaas_container_storage_disk }}"
+    iaas_glusterfs_disk: "{{ int_iaas_glusterfs_disk }}"
+    iaas_internal_network: "{{ int_iaas_internal_network }}"
+    dns_provider: "{{ int_dns_provider }}"
+
+    ansible_ssh_private_key_file: "/work/q-root-id_rsa"
+    ansible_user: "cloud-user"
+
+
+- name: Add infras
+  add_host:
+    name: "infra0"
+    groups: 
+    - openstack_instances
+    - infranodes
+    - cns
+    os_security_groups: 
+    - default
+    - ssh_only
+    - ose3_node
+    - ose3_sdn
+    iaas_machine_size: "{{ int_iaas_machine_size }}"
+
+    iaas_image: "{{ int_iaas_image }}"
+    iaas_container_storage_disk: "{{ int_iaas_container_storage_disk }}"
+    iaas_glusterfs_disk: "{{ int_iaas_glusterfs_disk }}"
+    iaas_internal_network: "{{ int_iaas_internal_network }}"
+    dns_provider: "{{ int_dns_provider }}"
+
+- name: Add nodes
+  add_host:
+    name: "node0"
+    groups: 
+    - openstack_instances
+    - nodes
+    - cns
+    os_security_groups: 
+    - default
+    - ssh_only
+    - ose3_node
+    - ose3_sdn
+    iaas_machine_size: "{{ int_iaas_machine_size }}"
+
+    iaas_image: "{{ int_iaas_image }}"
+    iaas_container_storage_disk: "{{ int_iaas_container_storage_disk }}"
+    iaas_glusterfs_disk: "{{ int_iaas_glusterfs_disk }}"
+    iaas_internal_network: "{{ int_iaas_internal_network }}"
+    dns_provider: "{{ int_dns_provider }}"
+
+# Import that bastion is the last host, because of creating the env.yml
+- name: bastion
+  add_host:
+    name: "bastion"
+    groups: openstack_instances
+    iaas_public_ip: true
+    iaas_container_storage_disk: 0 
+    iaas_glusterfs_disk: 0
+    os_security_groups: 
+    - default
+    - ssh_only
+    - ose3_router
+    iaas_machine_size: "m1.small"
+    iaas_image: "{{ int_iaas_image }}"
+    dns_provider: "{{ int_dns_provider }}"
+    iaas_internal_network: "{{ int_iaas_internal_network }}"

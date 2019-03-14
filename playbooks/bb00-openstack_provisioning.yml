@@ -1,0 +1,36 @@
+#!/usr/bin/env ansible-playbook
+---
+
+- hosts: localhost
+  gather_facts: False
+  become: False
+  connection: local
+  serial: 1 # Because my lab is not so fast
+  tasks:
+    - name: Parameter validation
+      import_role:
+        name: bb0-openstack
+        tasks_from: validate-parameters.yml
+
+    - name: Create mini inventory
+      import_role:
+        name: bb0-openstack
+        tasks_from: create-inventory-mini.yml
+
+    - name: Provisioning pre once
+      import_role:
+        name: bb0-openstack
+        tasks_from: provisioning-pre-once.yml
+
+
+# openstack_instances, created by create-inventory-mini.yml
+- hosts: openstack_instances
+  gather_facts: False
+  become: False
+  connection: local
+  serial: 1 # Because my lab is not so fast
+  tasks:
+    - name: Provisioning
+      import_role:
+        name: bb0-openstack
+        tasks_from: provisioning.yml
