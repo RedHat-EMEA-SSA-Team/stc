@@ -3,7 +3,7 @@
 To get started you will need two main things
 
 [square]
-* At least 4 VMs / hosts 
+* At least 4 VMs / hosts
 * RedHat Openshift Container Platform subscription
 
 === Hardware requirements
@@ -33,6 +33,7 @@ All hosts should be identical
 * hosts need to have access to each other (all ports or ports listed https://docs.openshift.com/container-platform/latest/install_config/install/prerequisites.html#required-ports[in here])
 * Internet connection, direct or thru proxy
 * at least one of the hosts must able to get SSL connection to all others hosts
+* if firewall rules are active (e.g. on the bastion hosts), the rules must be maintained by iptables, not firewalld
 
 === Operating system requirements
 * RHEL 7.4+ minimal (OS will be updated during validation phase)
@@ -40,4 +41,4 @@ All hosts should be identical
 
 === Other useful info
 * Information about proxy; address, username, password, whitelists etc.
-* Red Hat Subscription Management (RHSM) account info or Satellite activation keys for registering and subscribing hosts 
+* Red Hat Subscription Management (RHSM) account info or Satellite activation keys for registering and subscribing hosts

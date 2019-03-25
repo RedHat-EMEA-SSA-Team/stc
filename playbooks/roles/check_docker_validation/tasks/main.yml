@@ -1,4 +1,5 @@
 - name: Pull some basic docker images
-  command: "docker pull {{item}}:{{docker_prepull_tag}}"
+  docker_image:
+    name: "{{item}}:{{docker_prepull_tag}}"
   with_items:
   - "{{docker_prepull}}"

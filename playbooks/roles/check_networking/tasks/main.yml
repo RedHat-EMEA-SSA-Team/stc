@@ -13,3 +13,12 @@
     state: present
     reload: yes
   when: ip_forward_check.stdout == 0
+
+- name: Check state of firewalld
+  systemd: name=firewalld
+  register: firewalld_check
+
+- name: Fail when firewalld is active
+  fail:
+    msg: "firewalld is active, but iptables is required"
+  when: "firewalld_check.status.ActiveState == 'active'"

@@ -2,6 +2,7 @@
 - name: Validate proxy
   hosts: all
   gather_facts: yes
+  tags: proxy
   vars:
     proxy_uc_envs:
     - HTTP_PROXY
@@ -20,6 +21,7 @@
 
 - name: ensure bastion packages.
   hosts: bastion
+  tags: packages
   gather_facts: yes
   vars_files:
   - "{{file_env}}"
@@ -29,6 +31,7 @@
 - name: ensure subscription
   gather_facts: no
   hosts: nodes
+  tags: subscription
   vars_files:
   - "{{file_env}}"
   - "{{file_secrets}}"
@@ -38,18 +41,29 @@
 
 - name: ensure nodes packages.
   hosts: nodes
+  tags: packages
+  serial: 1
+  gather_facts: no
+  vars_files:
+  - "{{file_env}}"
+  roles:
+  - check_packages_nodes
+
+- name: ensure nodes networking.
+  hosts: all
+  tags: networking
   serial: 1
   gather_facts: no
   vars_files:
   - "{{file_env}}"
   roles:
   - check_networking
-  - check_packages_nodes
 
 
 - name: Validate environment
   gather_facts: no
   hosts: all
+  tags: validate
   vars_files:
   - "{{file_env}}"
   - "{{file_secrets}}"
@@ -82,6 +96,7 @@
 
 - name: Initialize firewall check
   hosts: nodes
+  tags: firewall
   gather_facts: no
   vars_files:
   - "{{file_env}}"
@@ -90,6 +105,7 @@
 
 - name: Execute firewall check
   hosts: localhost
+  tags: firewall
   gather_facts: yes
   vars_files:
   - "{{file_env}}"
@@ -98,6 +114,7 @@
 
 - name: Validate docker
   hosts: nodes
+  tags: docker
   gather_facts: yes
   vars_files:
   - "{{file_env}}"
@@ -107,6 +124,7 @@
 
 - name: Cleanup validation trash
   hosts: all
+  tags: cleanup
   gather_facts: yes
   vars_files:
   - "{{file_env}}"

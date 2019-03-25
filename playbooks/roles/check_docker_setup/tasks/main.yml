@@ -38,10 +38,11 @@
 - name: Fail if Docker version is < {{docker_version}}
   fail:
     msg: 'docker_version must be >= 1.12, yours is set to {{ docker_version }}.'
-  when: docker_version | version_compare('1.12', '<')
+  when: docker_version is version_compare('1.12', '<')
 
-- name: Enable docker
-  command: systemctl enable docker
 
-- name: Start docker
-  command: systemctl start docker
+- name: Enable and start docker
+  service:
+    name: docker
+    enabled: yes
+    state: started
