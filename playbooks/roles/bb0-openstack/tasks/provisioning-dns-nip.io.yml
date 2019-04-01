@@ -1,0 +1,7 @@
+---
+- name: Set public name
+  set_fact:
+    openshift_master_cluster_public_hostname: "api.{{ instance_data.openstack.public_v4 }}.nip.io"
+    openshift_master_default_subdomain: "apps.{{ instance_data.openstack.public_v4 }}.nip.io"
+    bastion_public_hostname: "bastion.{{ instance_data.openstack.public_v4 }}.nip.io"
+  when: ( instance_data.openstack.public_v4 != "" and inventory_hostname == "bastion" )

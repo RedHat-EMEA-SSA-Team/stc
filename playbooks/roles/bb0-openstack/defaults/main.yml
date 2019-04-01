@@ -1,0 +1,4 @@
+---
+# defaults file for provisioning_openstack
+
+heat_template_path: heat/openshift.yaml

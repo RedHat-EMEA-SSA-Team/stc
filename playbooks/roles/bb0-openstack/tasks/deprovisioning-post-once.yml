@@ -1,0 +1,56 @@
+---
+
+- name: Add ssh
+  os_keypair:
+    auth:
+      auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+      username: "{{ lookup('env','OS_USERNAME') }}"
+      password: "{{ lookup('env','OS_PASSWORD') }}"
+    state: absent
+    name: openshift-stc-key
+
+# Delete security groups
+- name: "Delete security groups"
+  os_security_group:
+    state: absent
+    name: "{{item.name}}"
+    description: "secgroup {{ item.name }} - managed by ansible"
+  auth:
+      auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+      username: "{{ lookup('env','OS_USERNAME') }}"
+      password: "{{ lookup('env','OS_PASSWORD') }}"
+  with_items:
+     - "{{ os_sec_groups }}"
+
+# Delete cloud flare dns 
+- name: Optional cloud clare dns
+  block:
+    - name: Delete DNS record bastion
+      cloudflare_dns:
+        zone: "{{ cloudflare_zone }}"
+        record: "bastion{{ cloudflare_name_postfix }}"
+        type: A
+        account_email: "{{ cloudflare_account_email }}"
+        account_api_token: "{{ cloudflare_account_api_token }}"
+        state: absent
+
+    - name: Delete DNS record  *.apps
+      cloudflare_dns:
+        zone: "{{ cloudflare_zone }}"
+        record: "*.apps{{ cloudflare_name_postfix }}"
+        type: A
+        account_email: "{{ cloudflare_account_email }}"
+        account_api_token: "{{ cloudflare_account_api_token }}"
+        state: absent
+
+    - name: Delete DNS record api
+      cloudflare_dns:
+        zone: "{{ cloudflare_zone }}"
+        record: "api{{ cloudflare_name_postfix }}"
+        type: A
+        account_email: "{{ cloudflare_account_email }}"
+        account_api_token: "{{ cloudflare_account_api_token }}"
+        state: absent  
+  when: ( dns_provider | default('nip.io') == "cloudflare" )

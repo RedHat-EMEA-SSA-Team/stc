@@ -1,0 +1,33 @@
+---
+- name: Delete instance
+  os_server:
+    api_timeout: 360 # Because my lab is not so fast
+    state: absent
+    auth:
+      auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+      username: "{{ lookup('env','OS_USERNAME') }}"
+      password: "{{ lookup('env','OS_PASSWORD') }}"
+    name: "{{ inventory_hostname }}"
+
+- name: Delete container storage disk
+  os_volume:
+    state: absent
+    auth:
+      auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+      username: "{{ lookup('env','OS_USERNAME') }}"
+      password: "{{ lookup('env','OS_PASSWORD') }}"
+    display_name: "{{ inventory_hostname }}_container_storage_disk"
+  when: ( iaas_container_storage_disk | int > 0 )
+
+- name: Delete glusterfs disk
+  os_volume:
+    state: absent
+    auth:
+      auth_url: "{{ lookup('env','OS_AUTH_URL') }}"
+      project_name: "{{ lookup('env','OS_PROJECT_NAME') }}"
+      username: "{{ lookup('env','OS_USERNAME') }}"
+      password: "{{ lookup('env','OS_PASSWORD') }}"
+    display_name: "{{ inventory_hostname }}_glusterfs_disk"
+  when: ( iaas_glusterfs_disk | int > 0 )

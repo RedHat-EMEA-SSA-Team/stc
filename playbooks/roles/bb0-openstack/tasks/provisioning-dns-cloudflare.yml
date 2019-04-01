@@ -1,0 +1,57 @@
+---
+- name: Validate CloudFlare env variables
+  assert:
+    that: 
+      - lookup('env', item ) is defined
+    msg: "CloudFlare env variable {{ item }} is NOT defined!"
+  with_items:
+    - CLOUDFLARE_ACCOUNT_EMAIL 
+    - CLOUDFLARE_ACCOUNT_API_TOKEN 
+    - CLOUDFLARE_ZONE 
+    - CLOUDFLARE_NAME_POSTFIX 
+  when: ( instance_data.openstack.public_v4 != "" and inventory_hostname == "bastion" )
+
+- name: Set cloudflare vars
+  set_fact:
+    cloudflare_account_email: "{{ lookup('env','CLOUDFLARE_ACCOUNT_EMAIL') }}"
+    cloudflare_account_api_token: "{{ lookup('env','CLOUDFLARE_ACCOUNT_API_TOKEN') }}"
+    cloudflare_zone: "{{ lookup('env','CLOUDFLARE_ZONE') }}"
+    cloudflare_name_postfix: "{{ lookup('env','CLOUDFLARE_NAME_POSTFIX') }}"
+  when: ( instance_data.openstack.public_v4 != "" and inventory_hostname == "bastion" )
+
+- name: Create DNS record bastion{{cloudflare_name_postfix}} => {{ instance_data.openstack.public_v4 }}
+  cloudflare_dns:
+    zone: "{{ cloudflare_zone }}"
+    record: "bastion{{ cloudflare_name_postfix }}"
+    type: A
+    value: "{{ instance_data.openstack.public_v4 }}"
+    account_email: "{{ cloudflare_account_email }}"
+    account_api_token: "{{ cloudflare_account_api_token }}"
+  when: ( instance_data.openstack.public_v4 != "" and inventory_hostname == "bastion" )
+
+- name: Create DNS record  *.apps{{cloudflare_name_postfix}} => {{ instance_data.openstack.public_v4 }}
+  cloudflare_dns:
+    zone: "{{ cloudflare_zone }}"
+    record: "*.apps{{ cloudflare_name_postfix }}"
+    type: A
+    value: "{{ instance_data.openstack.public_v4 }}"
+    account_email: "{{ cloudflare_account_email }}"
+    account_api_token: "{{ cloudflare_account_api_token }}"
+  when: ( instance_data.openstack.public_v4 != "" and inventory_hostname == "bastion" )
+
+- name: Create DNS record api{{cloudflare_name_postfix}} => {{ instance_data.openstack.public_v4 }}
+  cloudflare_dns:
+    zone: "{{ cloudflare_zone }}"
+    record: "api{{ cloudflare_name_postfix }}"
+    type: A
+    value: "{{ instance_data.openstack.public_v4 }}"
+    account_email: "{{ cloudflare_account_email }}"
+    account_api_token: "{{ cloudflare_account_api_token }}"
+  when: ( instance_data.openstack.public_v4 != "" and inventory_hostname == "bastion" )
+
+- name: Set public name
+  set_fact:
+    openshift_master_cluster_public_hostname: "api{{ cloudflare_name_postfix }}.{{ cloudflare_zone }}"
+    openshift_master_default_subdomain: "apps{{ cloudflare_name_postfix }}.{{ cloudflare_zone }}"
+    bastion_public_hostname: "bastion{{ cloudflare_name_postfix }}.{{ cloudflare_zone }}"
+  when: ( instance_data.openstack.public_v4 != "" and inventory_hostname == "bastion" )
