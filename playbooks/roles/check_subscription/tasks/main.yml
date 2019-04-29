@@ -1,24 +1,33 @@
-- name: Register to RHSM
-  redhat_subscription:
-    state: present
-    username: "{{ rhn_username }}"
-    password: "{{ rhn_password }}"
-    pool_ids: "{{ subscription_pool_id }}"
-  register: subscribe
-  when: subscription_pool_id is defined
-- name: Register to Satellite
-  redhat_subscription:
-    state: present
-    activationkey: "{{ subscription_activationkey }}"
-    org_id: "{{ subscription_org_id }}"
-  register: subscribe_sat
-  when: subscription_org_id is defined and subscription_activationkey is defined and subscription_pool_id is not defined
-- name: Disable all repos
-  shell: |
-    subscription-manager repos --disable='*'
-- name: Enable correct repos
-  shell: |
-    subscription-manager repos --enable='{{item}}'
-  with_items:
-  - "{{repos}}"
-  when: item != ''
+
+
+- set_fact:
+    newline: "\n"
+- copy:
+    content: "{{ repos | sort | join('\n') }}\n"
+    dest: /tmp/stc-repos-should-enabled
+
+- shell: "subscription-manager repos --list-enabled | grep 'Repo ID'  | cut -f2 -d':' | tr -d ' ' | sort > /tmp/stc-repos-enabled"
+  args:
+    creates: /tmp/stc-repos-enabled
+
+- shell: "diff -Nuar /tmp/stc-repos-should-enabled /tmp/stc-repos-enabled"
+  ignore_errors: true
+  register: ret
+
+
+- assert:
+    that:
+      - "ret.rc == 0"
+    msg: 
+      - "Please check enabled repositories"
+      - "{{ ret.stdout_lines }}"
+
+- name: Cleanup tmp files
+  file:
+    state: absent
+    path: "{{ item }}"
+  with_items: 
+  - /tmp/stc-repos-should-enabled
+  - /tmp/stc-repos-enabled
+  tags:
+  - cleanup

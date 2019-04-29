@@ -25,8 +25,9 @@ oreg_url=registry.redhat.io/openshift3/ose-${component}:${version}
 oreg_auth_user={{registry_token_user}}
 oreg_auth_password={{registry_token}}
 {% else %}
-oreg_auth_user={{rhn_username}}
-oreg_auth_password={{rhn_password}}
+# Please set:
+# oreg_auth_user=...
+# oreg_auth_password=.....
 {% endif %}
 containerized=false
 

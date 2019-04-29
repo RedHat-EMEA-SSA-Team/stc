@@ -1,0 +1,10 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: all
+  gather_facts: false
+  become: true
+  tasks:
+    - name: Unregister host 
+      redhat_subscription:
+        state: absent
+

@@ -9,9 +9,6 @@
   - name: sudo_password
     prompt: Password for sudo, leave blank if passwordless sudo (will be encypted)
     private: yes
-  - name: rhn_password
-    prompt: Red Hat account password, leave blank if Satellite is using (will be encrypted)
-    private: yes
   tasks:
   - name: Cleanup
     file:
@@ -26,7 +23,6 @@
       dest: "{{file_secrets}}"
       content: |
         sudo_password: "{{sudo_password}}"
-        rhn_password: "{{rhn_password}}"
   - name: Verify Masters IP addresses
     local_action: |
       shell ping -c 1 {{item}} | grep "PING"| sed -e 's/[^a-zA-Z0-9.-]/ /g' | awk '{print $3 ": {{item }}" }' >> {{file_ip_data}}

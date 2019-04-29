@@ -38,6 +38,19 @@ All hosts should be identical
 === Operating system requirements
 * RHEL 7.4+ minimal (OS will be updated during validation phase)
 * root or sudo access
+* Subscriptions are allocated to systems (machines).
+**  Incase it is not, we provide an helper playbook: 
++
+----
+    ./setup.sh
+    cp playbooks/subscription-register.yml playbooks/subscription-register-private.yml
+
+    $EDITOR playbooks/subscription-register-private.yml <1>
+    ansible-playbook -i inventory playbooks/subscription-register-private.yml
+----
+<1> Adjust playbook - add RHSN user, passwort or activation key & org and pool id
+
+* Repositories enabled (The `subscription-register*` playbook above add repositories to )
 
 === Other useful info
 * Information about proxy; address, username, password, whitelists etc.
