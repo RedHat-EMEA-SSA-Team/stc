@@ -4,3 +4,4 @@ env.yml
 secret.yml
 inventory
 ip
+kcli-parameters.yml

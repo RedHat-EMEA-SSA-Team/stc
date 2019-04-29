@@ -1,0 +1,131 @@
+parameters:
+ prefix: ''
+ template: rhel-server-7.6-x86_64-kvm.qcow2
+ base_disk_size: 60
+ container_disk_size: 50
+ container_disk: vdb
+ glusterfs_disk_size: 100
+ glusterfs_disk: vdc
+ master_memory: 16384
+ infra_memory: 16384
+ node_memory: 16384
+ domain: example.com
+ pool: default
+ masters: 1
+ infras: 1
+ nodes: 1
+ version: 3.11
+ stc_clone_url: https://github.com/RedHat-EMEA-SSA-Team/stc.git
+ notifycmd: "journalctl -n 45 --no-pager /usr/bin/cloud-init"
+ 
+ api_dns: ''
+ apps_dns: ''
+ install_logging: n
+ install_metrics: n
+ registry_token_user: ''
+ registry_token: ''
+ deploy: false
+
+{{ domain }}:
+ type: network
+ cidr: 10.88.3.0/24
+ dhcp: True
+ nat: true
+
+{{ prefix }}bastion:
+ template: {{ template }}
+ numcpus: 2
+ memory: 4096
+ rhnregister: true
+ reservedns: true
+ sharedkey: true
+ nets:
+  - name: {{ domain }}
+    ip: 10.88.3.2
+    mask: 255.255.255.0
+    gateway: 10.88.3.1
+    dns: 10.88.3.1
+ disks:
+  - size: {{ base_disk_size }}
+ pool: {{ pool }}
+ files:
+  - path: /tmp/env.yml
+    origin: files/env.yml
+  - path: /tmp/secrets.yml
+    origin: files/secrets.yml
+  - path: /tmp/install-ocp.sh
+    origin: files/install-ocp.sh
+ scripts: 
+  - scripts/prep-host.sh
+  - scripts/prep-bastion.sh
+ notify: true
+ notifycmd: {{ notifycmd }}
+
+{% for master in range(0, masters) %}
+{{ prefix }}m0{{ master + 1 }}:
+ template: {{ template }}
+ numcpus: 4
+ memory: {{ master_memory }}
+ rhnregister: true
+ reservedns: true
+ sharedkey: true
+ nets:
+  - name: {{ domain }}
+    ip: 10.88.3.3{{ master }}
+    mask: 255.255.255.0
+    gateway: 10.88.3.1
+    dns: 10.88.3.1
+ disks:
+  - size: {{ base_disk_size }}
+  - size: {{ container_disk_size }}
+  - size: {{ glusterfs_disk_size }}
+ pool: {{ pool }}
+ scripts: 
+  - scripts/prep-host.sh
+{% endfor %}
+
+{% for node in range(0, nodes) %}
+{{ prefix }}n0{{ node + 1 }}:
+ template: {{ template }}
+ numcpus: 4
+ memory: {{ node_memory }}
+ rhnregister: true
+ reservedns: true
+ sharedkey: true
+ nets:
+  - name: {{ domain }}
+    ip: 10.88.3.4{{ node }}
+    mask: 255.255.255.0
+    gateway: 10.88.3.1
+    dns: 10.88.3.1
+ disks:
+  - size: {{ base_disk_size }}
+  - size: {{ container_disk_size }}
+  - size: {{ glusterfs_disk_size }}
+ pool: {{ pool }}
+ scripts: 
+  - scripts/prep-host.sh
+{% endfor %}
+
+{% for infra in range(0, infras) %}
+{{ prefix }}i0{{ infra + 1 }}:
+ template: {{ template }}
+ numcpus: 4
+ memory: {{ infra_memory }}
+ rhnregister: true
+ reservedns: true
+ sharedkey: true
+ nets:
+  - name: {{ domain }}
+    ip: 10.88.3.5{{ infra }}
+    mask: 255.255.255.0
+    gateway: 10.88.3.1
+    dns: 10.88.3.1
+ disks:
+  - size: {{ base_disk_size }}
+  - size: {{ container_disk_size }}
+  - size: {{ glusterfs_disk_size }}
+ pool: {{ pool }}
+ scripts: 
+  - scripts/prep-host.sh
+{% endfor %}
