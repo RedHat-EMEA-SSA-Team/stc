@@ -1,0 +1,6 @@
+playbooks/subscription-register-private.yml
+playbooks/*.entry
+env.yml
+secret.yml
+inventory
+ip
