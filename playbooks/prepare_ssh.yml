@@ -17,20 +17,19 @@
   vars_files:
   - "{{file_env}}"
   tasks:
-  - set_fact:
-      ssh_dir: /root/.ssh
-    when: ssh_user == 'root'
-  - set_fact:
-      ssh_dir: "/home/{{ssh_user}}/.ssh"
-    when: ssh_user != 'root'
-  - name: Remove old known_hosts
-    file:
-      path: "{{ssh_dir}}/known_hosts"
-      state: absent
   - name: Add key to authorized_keys
     authorized_key:
       user: "{{ssh_user}}"
       state: present
-      key: "{{ lookup('file', ssh_dir+'/id_rsa.pub') }}"
+      key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  - name: Fetch hostkey
+    connection: local
+    command: "ssh-keyscan {{ inventory_hostname }}"
+    register: hostkey
   - name: Run ssh-keyscan to add keys to known_hosts
-    local_action: "shell ssh-keyscan {{ inventory_hostname }} >> {{ssh_dir}}/known_hosts"
+    connection: local
+    known_hosts:
+      name: "{{ inventory_hostname }}"
+      key: "{{ item }}"
+    with_items: "{{ hostkey.stdout_lines }}"
+    when: hostkey.rc == 0
