@@ -262,11 +262,10 @@ if [ ! -f env.yml ]; then
 
     echo "Do you want to configure NTP servers? (NTP will be installed anyway if not present)"
     echo "y [n]"
-    echo "ntp_servers:" >> env.yml
     read ntp
 
     if [[ $ntp == "y"  ]]; then
-
+        echo "ntp_servers:" >> env.yml
         echo "Please insert number of NTP server to configure, default 1"
         read ntp_servers
         NTP=1
