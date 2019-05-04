@@ -18,6 +18,7 @@ glusterfs
 ansible_ssh_user={{ssh_user}}
 ansible_become={% if ssh_user == "root" %}no{% else %}yes{% endif %}
 
+
 # https://github.com/openshift/openshift-ansible/blob/master/DEPLOYMENT_TYPES.md
 deployment_type=openshift-enterprise
 oreg_url=registry.redhat.io/openshift3/ose-${component}:${version}
@@ -97,6 +98,23 @@ openshift_examples_modify_imagestreams=true
 
 # default subdomain to use for exposed routes
 openshift_master_default_subdomain={{ apps_dns | replace("*.","")  }}
+
+{%- if lb is defined and infranodes is defined -%}
+{%- set hosts_http=[] -%}
+{%- set hosts_https=[] -%}
+{% for infra_node in infranodes -%}
+{%   set str='{"name":"infra' ~ loop.index ~ '","address":"'~ infra_node ~ ':80","opts":"check"}' -%}
+{{   hosts_http.append('{"name":"infra' ~ loop.index ~ '","address":"'~ node_ip_map[infra_node] ~ ':80","opts":"check"}') }}
+{{   hosts_https.append('{"name":"infra' ~ loop.index ~ '","address":"'~ node_ip_map[infra_node] ~ ':443","opts":"check"}') }}
+{%- endfor %}
+
+openshift_loadbalancer_additional_frontends=[{"name":"atomic-openshift-infra-http","mode":"tcp","options":["tcplog"],"binds":["*:80"],"default_backend":"atomic-openshift-infra-http"},{"name":"atomic-openshift-infra-https","mode":"tcp","options":["tcplog"],"binds":["*:443"],"default_backend":"atomic-openshift-infra-https"}]
+
+openshift_loadbalancer_additional_backends=[{"name":"atomic-openshift-infra-http","mode":"tcp","option":"tcplog","balance":"roundrobin","servers":[{{ hosts_http | join(',') }}]},{"name":"atomic-openshift-infra-https","mode":"tcp","option":"tcplog","balance":"roundrobin","servers":[{{hosts_https| join(',')}}]}]
+
+r_openshift_loadbalancer_os_firewall_allow=[{"service":"haproxy stats","port":"9000/tcp"},{"service":"haproxy balance","port":"8443/tcp"},{"service":"haproxy infra http balance","port":"80/tcp"},{"service":"haproxy infra https balance","port":"443/tcp"}]
+
+{% endif %}
 
 # Openshift Registry Options
 openshift_hosted_registry_storage_kind=glusterfs

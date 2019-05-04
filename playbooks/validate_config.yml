@@ -43,6 +43,12 @@
   - local_action: |
       shell cat "{{file_ip_data}}"
     register: ip_data
+  - name: Build node_ip_map
+    set_fact:
+      node_ip_map: >-
+        {% set splited = item.split(':') | map('trim') | list -%}
+        {{ node_ip_map | default({}) | combine({splited[1]: splited[0]}) }}
+    with_items: "{{ ip_data.stdout_lines }}"
   - name: Print IP addresses
     debug:
       msg: |
