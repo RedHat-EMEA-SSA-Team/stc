@@ -342,7 +342,7 @@ fi
 
 OCP_VERSION=`grep ocp_version env.yml | awk '{print $2;}';`
 echo '*** Check enabled repos'
-REPOS="Repo ID:   rhel-7-server-ansible-2.5-rpms
+REPOS="Repo ID:   rhel-7-server-ansible-2.6-rpms
 Repo ID:   rhel-7-server-extras-rpms
 Repo ID:   rhel-7-server-ose-${OCP_VERSION}-rpms
 Repo ID:   rhel-7-server-rpms"

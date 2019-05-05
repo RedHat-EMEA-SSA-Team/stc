@@ -14,7 +14,9 @@ repos:
 - rhel-7-server-rpms
 - rhel-7-server-extras-rpms
 - "rhel-7-server-ose-{{ '%0.2f'| format(ocp_version|float) }}-rpms"
-- "{{ 'rhel-7-fast-datapath-rpms' if '%0.2f'| format(ocp_version|float) == '3.10' else 'rhel-7-server-extras-rpms'}}"
+# Does not make sense on nodes, but is so documented!
+# https://docs.openshift.com/container-platform/3.11/install/host_preparation.html
+- rhel-7-server-ansible-2.6-rpms
 packages:
 - wget
 - git

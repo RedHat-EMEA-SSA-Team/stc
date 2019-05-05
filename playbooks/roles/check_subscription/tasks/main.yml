@@ -1,21 +1,21 @@
-
-
-- set_fact:
-    newline: "\n"
-- copy:
+---
+- name: Create /tmp/stc-repos-should-enabled 
+  copy:
     content: "{{ repos | sort | join('\n') }}\n"
     dest: /tmp/stc-repos-should-enabled
 
-- shell: "subscription-manager repos --list-enabled | grep 'Repo ID'  | cut -f2 -d':' | tr -d ' ' | sort > /tmp/stc-repos-enabled"
+- name: Create /tmp/stc-repos-enabled
+  shell: "subscription-manager repos --list-enabled | grep 'Repo ID'  | cut -f2 -d':' | tr -d ' ' | sort > /tmp/stc-repos-enabled"
   args:
     creates: /tmp/stc-repos-enabled
 
-- shell: "diff -Nuar /tmp/stc-repos-should-enabled /tmp/stc-repos-enabled"
+- name: Compare stc-repos-should-enabled vs stc-repos-enabled
+  shell: "diff -Nuar /tmp/stc-repos-should-enabled /tmp/stc-repos-enabled"
   ignore_errors: true
   register: ret
 
-
-- assert:
+- name: Check enabled repositories
+  assert:
     that:
       - "ret.rc == 0"
     msg: 

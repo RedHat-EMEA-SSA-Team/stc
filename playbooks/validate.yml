@@ -35,6 +35,7 @@
   vars_files:
   - "{{file_env}}"
   roles:
+  - check_subscription
   - check_packages_nodes
 
 - name: ensure nodes networking.
