@@ -260,21 +260,12 @@ if [ ! -f env.yml ]; then
 
     echo "install_metrics: $install_metrics" >> env.yml
 
-    while  [ "$subscription" != "rhsm" -a "$subscription" != "satellite" ];
-    do
-        echo "Please select Subscription management: RHSM or Satellite"
-        echo "[rhsm] satellite"
-        read subscription
-        [[ -z $subscription ]] && subscription="rhsm"
-    done
-
     echo "Do you want to configure NTP servers? (NTP will be installed anyway if not present)"
     echo "y [n]"
-    echo "ntp_servers:" >> env.yml
     read ntp
 
     if [[ $ntp == "y"  ]]; then
-
+        echo "ntp_servers:" >> env.yml
         echo "Please insert number of NTP server to configure, default 1"
         read ntp_servers
         NTP=1
@@ -295,52 +286,6 @@ if [ ! -f env.yml ]; then
         done
     fi
 
-    if [ "$subscription" == "rhsm" ]; then
-        while  [ -z $rhsm_username ]
-        do
-            echo "Please insert RHSM username:"
-            read -r rhsm_username
-        done
-
-        echo "rhn_username: $rhsm_username" >> env.yml
-
-        echo '*** registering host to RHSM with username '$rhsm_username
-        sudo subscription-manager register --username $rhsm_username --force
-        if [ $? != 0 ]; then
-            echo "Error while registering host, please verify credentials"
-            exit 1
-        fi
-        echo 'Please insert pool id if any, leave blank to find out it automatically'
-        read pool_id
-        if [ -z "$pool_id" ]; then
-            echo '*** figuring out subscription pool id'
-            SUBSCRIPTION_POOL_ID=`sudo subscription-manager list --available --matches=*Openshift* --pool-only | head -1 - ` && echo 'subscription_pool_id: '$SUBSCRIPTION_POOL_ID >> env.yml
-        else
-            echo '*** using subscription pool id ' $pool_id
-            SUBSCRIPTION_POOL_ID=$pool_id
-            echo 'subscription_pool_id: '$SUBSCRIPTION_POOL_ID >> env.yml
-        fi
-    else
-        echo '*** registering host to Satellite'
-        while  [ -z $org_id ]
-        do
-            echo "Please insert Organization ID:"
-            read -r org_id
-        done
-
-        echo
-
-        while  [ -z $ak ]
-        do
-            echo "Please insert Activation Key:"
-            read -r ak
-        done
-
-        echo
-
-        echo "subscription_activationkey: $ak" >> env.yml
-        echo "subscription_org_id: $org_id" >> env.yml
-    fi
     if [ "$OCP_VERSION" == "3.11" ]; then
 
       echo "Do you have any Authentication Token for the Red Hat Registry? (this avoid plain text password in inventory)"
@@ -348,28 +293,19 @@ if [ ! -f env.yml ]; then
       echo "Please refers to the Official Documentation on how to do it:"
       echo "https://docs.openshift.com/container-platform/3.11/install_config/configuring_red_hat_registry.html#install-config-configuring-red-hat-registry"
       echo
-      echo "y [n]"
+      echo "[y] n"
       read registry_token
 
-      if [ "$registry_token" == "y" ]; then
-        while  [ -z $oreg_token_user ]
-        do
-            echo "Please insert Registry Service Accounts Token Username"
-            read -r oreg_token_user
-        done
-
+      if [ -z "$registry_token" ]; then
+        echo "Please insert Registry Service Accounts Token Username"
+        read -r oreg_token_user
         echo
         echo "registry_token_user: $oreg_token_user" >> env.yml
 
-
-        while  [ -z $oreg_token ]
-        do
-            echo "Please insert Registry Service Accounts Token"
-            read -r oreg_token
-        done
+        echo "Please insert Registry Service Accounts Token"
+        read -r oreg_token
         echo "registry_token: $oreg_token" >> env.yml
       fi
-
     fi
 
     echo
@@ -405,33 +341,29 @@ if [ "$install" == "n" ]; then
 fi
 
 OCP_VERSION=`grep ocp_version env.yml | awk '{print $2;}';`
-
-if grep subscription_pool_id env.yml >/dev/null; then
-    pool=`grep subscription_pool_id env.yml | awk '{print $2;}';`
-    echo '*** attaching host to correct subscription '
-    sudo subscription-manager attach --pool=$pool
-
-elif grep subscription_org_id env.yml >/dev/null; then
-    org_id=`grep subscription_org_id env.yml | awk '{print $2;}';`
-    activation_key=`grep subscription_activationkey env.yml | awk '{print $2;}';`
-    echo "*** using Organization ID $org_id and Activation Key $activation_key to register host"
-
-    sudo subscription-manager register --org="$org_id" --activationkey="$activation_key"
-fi
-
-
-echo '*** enable repos needed for OCP'
-echo '*** disable all repos'
-sudo subscription-manager repos --disable='*'
-sudo subscription-manager repos --enable=rhel-7-server-rpms --enable=rhel-7-server-extras-rpms --enable=rhel-7-server-ose-$OCP_VERSION-rpms
+echo '*** Check enabled repos'
+REPOS="Repo ID:   rhel-7-server-ansible-2.5-rpms
+Repo ID:   rhel-7-server-extras-rpms
+Repo ID:   rhel-7-server-ose-${OCP_VERSION}-rpms
+Repo ID:   rhel-7-server-rpms"
 
 if [ "$OCP_VERSION" == "3.10" ]; then
-	ANSIBLE_VERSION="2.4"
-	sudo subscription-manager repos --enable=rhel-7-fast-datapath-rpms
-
+  REPOS="Repo ID:   rhel-7-server-ansible-2.4-rpms
+Repo ID:   rhel-7-server-extras-rpms
+Repo ID:   rhel-7-server-ose-${OCP_VERSION}-rpms
+Repo ID:   rhel-7-server-rpms"
 fi
-echo '*** enable ansible '$ANSIBLE_VERSION' repo for OCP '$OCP_VERSION
-sudo subscription-manager repos --enable=rhel-7-server-ansible-$ANSIBLE_VERSION-rpms
+
+echo -e "$REPOS" | sort > /tmp/stc-repos-should-enabled
+sudo  subscription-manager repos --list-enabled | grep 'Repo ID' | sort > /tmp/stc-repos-enabled
+diff -Nuar /tmp/stc-repos-should-enabled /tmp/stc-repos-enabled > /tmp/stc-repo-diff
+RC_DIFF=$?
+
+if [ $RC_DIFF -ne 0 ]; then
+    echo "Please check repos! Diff:"
+    cat /tmp/stc-repo-diff
+    exit $RC_DIFF;
+fi
 
 echo '*** install git and ansible'
 sudo yum install -y git ansible tmux nc screen

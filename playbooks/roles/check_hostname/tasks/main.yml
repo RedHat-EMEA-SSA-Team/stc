@@ -1,0 +1,16 @@
+---
+- name: Fetch fqdn (hostname -f)
+  command: hostname -f 
+  register: hostname_fqdn
+
+- name: Fetch hostname (hostname)
+  command: hostname
+  register: hostname
+
+- name: Check hostnames
+  assert:
+    that:
+      - "inventory_hostname == hostname.stdout"
+      - "inventory_hostname == hostname_fqdn.stdout"
+      - "hostname.stdout == hostname_fqdn.stdout"
+    msg: "Please check hostname: ansible inventory_hostname, $(hostname) and $(hostname -f) must be the same!"

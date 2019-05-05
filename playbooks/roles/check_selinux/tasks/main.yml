@@ -2,3 +2,9 @@
   command: getenforce
   register: sestatus
   changed_when: false
+
+- name: Check SELinux
+  assert:
+    that:
+      - "sestatus.stdout == 'Enforcing'"
+    msg: "Please set SELinux to Enforcing"

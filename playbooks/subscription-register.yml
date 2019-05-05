@@ -1,0 +1,26 @@
+#!/usr/bin/env ansible-playbook
+---
+- hosts: all
+  gather_facts: false
+  become: true
+  serial: 1
+  tasks:
+    - fail: 
+       msg: "Please adjust file and add subscription cred"
+
+#    - name: Register and subscribe to multiple pools.
+#      redhat_subscription:
+#        state: present
+#        username: joe_user
+#        password: somepass
+#        pool_ids:
+#        - 0123456789abcdef0123456789abcdef
+#        - 1123456789abcdef0123456789abcdef
+#
+
+#    - name: Update the consumed subscriptions from the previous example (remove Red Hat Virtualization subscription)
+#      redhat_subscription:
+#        state: present
+#        activationkey: 1-222333444
+#        org_id: 222333444
+#        pool: '^Red Hat Enterprise Server$'
